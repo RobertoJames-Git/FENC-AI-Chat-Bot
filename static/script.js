@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const textarea = document.getElementById('chat_input');
+    const textarea = document.getElementById('userInput');
 
     if (textarea) {
         textarea.addEventListener('input', () => {

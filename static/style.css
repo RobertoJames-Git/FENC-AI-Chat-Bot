@@ -63,7 +63,7 @@ body{
 }
 
 
-.chat_sidebar {
+.side_panel {
     display: flex;
     align-items: center; /* vertically center image and text */
     gap: 8px; /* optional: space between image and text */
@@ -77,7 +77,7 @@ body{
     transition:  0.3s ease-in-out border-left;
 }
 
-.chat_sidebar:hover,#new_chat_container:hover{
+.side_panel:hover,#new_chat_container:hover{
     border-left:20px solid #1946da;
 }
 
@@ -92,7 +92,7 @@ body{
 
 
 
-#chat_input {
+#userInput {
     /* Sizing and layout */
     box-sizing: border-box;
     width: 100%;
@@ -120,7 +120,7 @@ body{
 }
 
 
-#chat_input:focus{
+#userInput:focus{
     outline: none;
 
 }
@@ -155,17 +155,22 @@ outline: 2px solid white;
     border-bottom: 3px solid #1946da;
     border-radius: 12px;
     background-color: #303030;
-    margin-top: 30px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     
 }
 
-#current_convo_container{
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-end; /* Pushes content to the bottom */
-
+#current_convo_container {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding-right: 10px;
+  min-height: 0;
+  height: 100%;
+  justify-content:flex-end;
 
 }
+
 
 
 .unselectable {
@@ -173,4 +178,93 @@ outline: 2px solid white;
   -webkit-user-select: none; /* Safari */
   -moz-user-select: none;    /* Firefox */
   -ms-user-select: none;     /* Internet Explorer/Edge */
+}
+
+#ai_and_user_container {
+  display: none;
+  flex-shrink: 0;
+  flex-grow: 1;
+  width: 700px;
+  margin: 0 auto;
+  padding-top: 10px;
+}
+
+
+.user {
+    text-align: right;
+    background-color: #1946da;
+    color: white;
+    margin: 0 0 20px auto;
+    border-radius: 10px;
+    padding: 5px 10px;
+    max-width: 550px;
+    width: fit-content;
+    word-wrap: break-word; /* in case long words exceed fit-content */
+}
+
+.ai_response_error{
+    background-color: red;
+    color: white;
+    border-radius: 10px;
+    padding: 5px;
+    width: max-content;
+    margin:auto;
+}
+
+
+.ai_response p{
+    margin: 16px;
+}
+
+/* base <ul> style */
+.ai_response ul {
+list-style-type: disc;
+margin: 0;
+padding-left: 2.4em;   /* indent level 1 */
+}
+
+/* 2nd-level lists */
+.ai_response ul ul {
+list-style-type: circle;
+margin: 0.4em 0 0.4em 0; /* small vertical gap */
+padding-left: 1.2em;     /* additional indent */
+}
+
+/* 3rd-level (and deeper) lists */
+.ai_response ul ul ul {
+list-style-type: square;
+margin: 0.4em 0 0.4em 0;
+padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
+}
+
+/* 4th level (and deeper) lists */
+.ai_response ul ul ul ul{
+list-style-type: square;
+margin: 0.4em 0 0.4em 0;
+padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
+}
+
+/* WebKit */
+#current_convo_container::-webkit-scrollbar {
+  width: 20px;
+}
+
+#current_convo_container::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+#current_convo_container::-webkit-scrollbar-thumb {
+  background-color: #1946da;
+  border-radius: 10px;
+  border: 2px solid #1f1f1f;
+}
+
+#current_convo_container::-webkit-scrollbar-thumb:hover {
+  background-color: #2554f3;
+}
+
+/* Firefox */
+#current_convo_container {
+  scrollbar-width: thin;
+  scrollbar-color: #1946da #1f1f1f;
 }
