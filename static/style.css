@@ -244,27 +244,57 @@ margin: 0.4em 0 0.4em 0;
 padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 }
 
-/* WebKit */
+/* ========== WebKit Browsers (Chrome, Edge, Safari) ========== */
 #current_convo_container::-webkit-scrollbar {
-  width: 20px;
+  width: 10px;               /* Width of vertical scrollbar */
 }
 
 #current_convo_container::-webkit-scrollbar-track {
-  border-radius: 10px;
+  background: transparent;   /* Transparent track (no background) */
 }
 
 #current_convo_container::-webkit-scrollbar-thumb {
-  background-color: #1946da;
+  background-color: #1946da; /* Scrollbar thumb (draggable part) */
   border-radius: 10px;
-  border: 2px solid #1f1f1f;
+  border: 2px solid transparent; /* Optional spacing effect */
+  background-clip: content-box;  /* Prevents border from filling in */
 }
 
 #current_convo_container::-webkit-scrollbar-thumb:hover {
-  background-color: #2554f3;
+  background-color: #2554f3; /* Brighter on hover */
 }
 
-/* Firefox */
+
+/* ========== Firefox Support ========== */
 #current_convo_container {
+  scrollbar-width: thin;                        /* 'thin' or 'auto' */
+  scrollbar-color: #1946da transparent;         /* thumb | track */
+}
+
+
+
+/* Firefox */
+#userInput {
   scrollbar-width: thin;
-  scrollbar-color: #1946da #1f1f1f;
+  scrollbar-color: #1946da transparent;
+}
+
+/* WebKit (Chrome, Edge, Safari) */
+#userInput::-webkit-scrollbar {
+  width: 8px;
+}
+
+#userInput::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#userInput::-webkit-scrollbar-thumb {
+  background-color: #1946da;
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+#userInput::-webkit-scrollbar-thumb:hover {
+  background-color: #2554f3;
 }

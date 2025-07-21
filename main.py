@@ -14,7 +14,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+# Handle chat questions
+chat_history = []
+ 
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -23,8 +25,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 async def get_index():
     return FileResponse("index.html")
 
-# Handle chat questions
-chat_history = []
+
 
 @app.post("/ask")
 async def ask_question(request: Request):

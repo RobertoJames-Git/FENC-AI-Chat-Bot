@@ -8,11 +8,12 @@ if not api_key:
     raise ValueError("GEMINI_API_KEY not found in .env file")
 
 genai.configure(api_key=api_key)
-model = genai.GenerativeModel('gemini-2.5-pro')
+
+model = genai.GenerativeModel('gemini-1.5-flash')
 
 def create_section_paths_dict(base_folder="Sections"):
     section_paths = {}
-    key_list = []
+    key_list = [] 
 
     if not os.path.isdir(base_folder):
         return section_paths, key_list

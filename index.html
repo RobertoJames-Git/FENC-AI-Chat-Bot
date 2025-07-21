@@ -9,6 +9,9 @@
 
         async function sendQuestion() {
           const userInput = document.getElementById("userInput").value.trim();
+          document.getElementById("userInput").value = "";
+
+
           insertUserMessage("user",userInput);//add users message to the container above the textbox
           document.getElementById("ai_and_user_container").style.display="block";
           document.getElementById("current_convo_container").style.justifyContent="flex-start";
