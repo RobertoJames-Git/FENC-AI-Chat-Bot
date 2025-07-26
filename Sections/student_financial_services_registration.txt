@@ -1,103 +1,38 @@
 student_financial_services_registration_and_enrolment.txt
 
- STUDENT FINANCIAL SERVICES
+STUDENT FINANCIAL SERVICES
 
- Garcia Green-McLennon 
-Director, Student Financing 
+Garcia Green-McLennon  
+Director, Student Financing
 
+OVERVIEW  
+The information contained herein represents a comprehensive policy guideline on matters concerning student financing for undergraduate students, including information on fee payment requirements as well as student-related financial services offered by the University. All undergraduate students are required to comply with these policy directives and adhere to the attending procedures as outlined in this section of the Student Handbook. Please note that these policies and procedures are subject to change without notice.
 
-OVERVIEW 
-The information contained herein represents a 
-comprehensive policy guideline on matters 
-concerning student financing for undergrad- 
-uate students; to include information on fee 
-pay- ment requirements as well as student 
-related financial services offered by the 
-University.
- All undergraduate students are required to 
-comply with these policy directives and adhere 
-to the attending procedures; as outlined in this 
-section of the Student Handbook. Please note 
-that these policies and procedures are subject 
-to change without notice.
+FEE STRUCTURE  
+THE ENROLMENT COMMITMENT DEPOSIT (ECD)  
+All students are required to make a mandatory Enrolment Commitment Deposit (ECD) payment at the start of each semester in order to begin module selection. The ECD is not an additional fee; instead, it is a deposit towards the overall cost for each semester’s tuition and is non-refundable. The ECD is also non-transferable from one academic year to the next, except where students are approved for Leave of Absence or Deferral as a newly admitted student.
 
-FEE STRUCTURE 
-THE ENROLMENT COMMITMENT DEPOSIT (ECD) 
-All students are required to make a mandatory 
-Enrolment Commitment Deposit (ECD) pay
-ment at the start of each semester; in order 
-to begin module selection. The ECD is not an 
-additional fee, instead it is a deposit towards 
-the overall cost for each semester’s tuition and 
-is non-refundable. The ECD is also non-transfer- 
-rable from one academic year to the next; 
-except where students are approved for Leave
-of Absence; or Deferral as a newly admitted 
-student.  
+Once the ECD requirement is satisfied, students will be given the opportunity to select modules, and they are required to meet the minimum amount for financial clearance in each semester as per the approved payment plan options.
 
-Once the ECD requirement is satisfied, students 
-will be given the opportunity to select modules; 
-and they are required to meet the minimum 
-amount for financial clearance in each semester; 
-as per the approved payment plan options. 
-T UITION & A NCILL ARY FEES 
-Tuition fees are payable at the start of each 
-semester, while the following non-refundable 
-ancillary fees are payable annually, usually at 
-the beginning of the academic year
+TUITION & ANCILLARY FEES  
+Tuition fees are payable at the start of each semester, while the following non-refundable ancillary fees are payable annually, usually at the beginning of the academic year:
+- Students’ Union Dues
+- Health Insurance
+- Student Welfare Fund
+- Registration
+- Jam Copy Tariff
+- Health/Personal Accident Insurance
+- Other fees where applicable (Law Library, Axis Journal, E-Books)
 
- 1.  Students’ Union Dues
- 2. Health Insurance
- 3.  Student Welfare Fund
- 4. Registration
- 5. Jam Copy Tariff
- 6.  Health/Personal Accident Insurance
- 7. Other fees where applicable (Law Library, 
-Axis Journal, E-Books)
+Students are required to pay all the fee components outlined above. In addition, some Colleges/Faculties may have other prescribed fees for particular activities. For example, Axis Journal fee – applicable to Faculty of the Built Environment, Law Library fee in the Faculty of Law, and the E-books fee, applicable to the College of Health Sciences.
 
- Students are required to pay all the fee compo
-nents outlined above. In addition, some Col
-leges/Faculties may have other prescribed fees
-for particular activities. For example, Axis Jour
-nal fee – applicable to Faculty of the Built 
-Envi-ronment, Law Library fee in the Faculty of 
-Law, and the E-books fee, applicable to the 
-College of Health Sciences. 
+Please note that the ECD paid in a student’s first semester will go towards the mandatory miscellaneous fees. Where the Ancillary Fees are more than the ECD, the student will be required to pay the difference at the start of the academic year.
 
-Please note that the ECD which is paid in a 
-student’s first semester will go towards the 
-mandatory miscellaneous fees. Where the 
-Ancillary Fees are more than the ECD, the 
-student will be required to pay the difference 
-at the start of the academic year
-
- TUITION FEES 
- 1. Tuition fees are calculated on a per credit
- basis, and are based on the total number of
- credits taken by a student in a given
- semester.
-
- 2.  The cost per credit for each module is
- determined by the Faculty/College from
- which the module is being offered, based
- on the associated credit value assigned to 
-each module. The following guidelines are
- applicable as it relates to tuition fees.
-
- 3. Under Semesterization, students are
- allowed to select modules and class times
- online using UTech, Ja’s Students’ Portal,
- via the University’s website at
- www.utech.edu.jm.
-
- 4. Students can ascertain the cost per credit 
-for each module from the respective Col
-lege/Faculty that offers the respective
- modules. This information is displayed on
- the student's fee breakdown and on the
- Students’ Portal.
-
-
+TUITION FEES  
+1. Tuition fees are calculated on a per credit basis and are based on the total number of credits taken by a student in a given semester.
+2. The cost per credit for each module is determined by the Faculty/College from which the module is being offered, based on the associated credit value assigned to each module. The following guidelines are applicable as it relates to tuition fees.
+3. Under Semesterization, students are allowed to select modules and class times online using UTech, Ja’s Students’ Portal, via the University’s website at www.utech.edu.jm.
+4. Students can ascertain the cost per credit for each module from the respective College/Faculty that offers the respective modules. This information is displayed on the student's fee breakdown and on the Students’ Portal.
 
 1. Based on the modules selected and the credit assignment for each module, an invoice is generated automatically; which details the total amount for which the student is billed for the modules selected; plus the miscellaneous fees.
 2. The flexibility of semesterization allows students to take a minimum of nine (9) credits per semester; thereby giving them the freedom to meet their financial obligations to the University.
@@ -108,8 +43,6 @@ lege/Faculty that offers the respective
 7. If offered, all students who do not pay 100% of fees for modules selected by the Census Date, would default to the University’s Standard Payment Plan for that semester and would be subjected to all terms and conditions of the plan.
 8. Students may request an estimate of fees from Student Financing Department by sending an email to [feesestimate@utech.edu.jm](mailto:feesestimate@utech.edu.jm)
 9. The Estimate of Fees is offered at no cost
-
-
 
 ANCILLARY FEES
 
@@ -529,7 +462,24 @@ ent the original receipt to substantiate the
 account is fully settled), to cease the pay
 roll deductions.
 
-FEE PAYMENT PROCEDURES FOR EARN & STUDY STUDENTS 
+ersity of Technology, 
+Jamaica (UTech, Ja.) has implemented an initia- 
+tive to recognize and reward students who 
+attend to their tuition requirements in full and 
+on-time each semester. Students who pay 
+100% of their tuition and miscellaneous fees 
+on-time and complete the 10-step process on
+line to complete registration by the Census 
+Date will receive a 2% rebate on tuition fees 
+only.
+
+ELIGIBILITY CRITERIA
+
+All fully registered students both local and
+ international, at the undergraduate level.
+
+Students may be attending any one of the
+ University’s campuseFEE PAYMENT PROCEDURES FOR EARN & STUDY STUDENTS 
 
  Students employed on the University's
  Earn & Study Programme are allowed to
@@ -564,24 +514,7 @@ GUIDELINES FOR TUITION REBATE
 RATIONALE
 
 In a bid to augment our fee payment offerings 
-to students, the University of Technology, 
-Jamaica (UTech, Ja.) has implemented an initia- 
-tive to recognize and reward students who 
-attend to their tuition requirements in full and 
-on-time each semester. Students who pay 
-100% of their tuition and miscellaneous fees 
-on-time and complete the 10-step process on
-line to complete registration by the Census 
-Date will receive a 2% rebate on tuition fees 
-only.
-
-ELIGIBILITY CRITERIA
-
-All fully registered students both local and
- international, at the undergraduate level.
-
-Students may be attending any one of the
- University’s campuses, including all satel
+to students, the Univs, including all satel
 lite campuses in Jamaica.
 
 Students must be fully registered and all
@@ -1044,7 +977,7 @@ dent may apply for a refund at the end of
  In order to submit a refund application at
  the end of the academic year, students are
  required to download the refund applica
-tion form from the University's website at
+application form from the University's website at
  www.utech.edu.jm.
 
  The completed application form is to be
@@ -1077,8 +1010,7 @@ tions for the student to receive the refund,
  
  The completed application form is to be
  submitted along with copies of all receipts
- for funds paid out of pocket for the aca
-demic year (if applicable).
+ paid out of pocket for the academic year (if applicable).
 
  Sponsored students are required to iden
 tify themselves on the application form by
