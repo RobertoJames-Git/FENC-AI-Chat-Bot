@@ -1,0 +1,8 @@
+1) Ensure the AI only answers utech related info
+2) I deiliberately did not include the university calendar from the handbook because things like this change frequently
+3) Ensure the AI only answers questions about the university. Nothing more
+4) Trim user input before it comes to the AI. Ensure user input is not filled wit white spaces
+
+
+
+Note: STUDENTS’ UNION COUNCIL MEMBERS was not added as this can change every academic year

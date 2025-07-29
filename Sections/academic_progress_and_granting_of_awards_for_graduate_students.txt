@@ -1,0 +1,145 @@
+academic_progress_and_granting_of_awards_for_graduate_students.txt
+
+
+ACADEMIC PROGRESS AND GRANTING OF AWARDS FOR GRADUATE STUDENTS
+
+Graduate students must maintain a cumulative GPA of at least 3.0 throughout their course of study to be in good academic standing. 
+
+- If the GPA falls below 3.0, the student will be placed on academic probation for one semester.
+- If the GPA remains below 3.0 after the probation period, the student will be discontinued from the course of study.
+
+POST-GRADUATE CERTIFICATE
+- Same academic level as a postgraduate diploma
+- Generally vocational in nature
+- Minimum of 30 credits required
+- May include or exclude a research component
+
+POST-GRADUATE DIPLOMA
+- Shorter than a Master’s degree
+- Same academic level as a Master’s degree
+- Requires 30 credits:
+  - 24 credits of coursework
+  - 6 credits of research (optional)
+
+MASTERS DEGREE
+- Requires a minimum of 36 credits beyond the Bachelor’s degree
+  - Core modules: 15–18 credits
+  - Specialization modules: 12–15 credits
+  - Research project: 6 credits (can be replaced with coursework)
+
+MASTER OF PHILOSOPHY (MPhil)
+- Advanced Master’s degree before a PhD
+- Requirements:
+  - Critical investigation and evaluation of a topic
+  - Understanding of appropriate research methods
+  - Oral defense of a substantial thesis
+- Total of 40 credits beyond the Bachelor’s degree:
+
+  Degree Component             Credits
+  --------------------------  -------
+  Thesis/Dissertation           22
+  Research Methodology           6
+  Discipline-specific Modules    9
+  Peer-reviewed Publication      3 (1 publication)
+  Total                         40
+
+PROFESSIONAL OR TAUGHT DOCTORATES
+- Includes substantial taught components
+- Examples: Doctor of Business Administration (DBA), Doctor of Pharmacy (PharmD)
+- Requires 60–90 credits beyond the Master’s degree
+
+DOCTOR OF PHILOSOPHY (PhD)
+- Highest university degree involving original research
+- Requirements:
+  - Independent, original, and significant contribution to knowledge
+  - Understanding of appropriate research methods
+  - Oral defense of a dissertation
+- Must complete 90 credits beyond the Bachelor’s degree:
+
+
+Degree Structure for MPhil and PhD
+
++-----------------------------+--------+--------+
+| Degree Component            | MPhil  |  PhD   |
++-----------------------------+--------+--------+
+| Thesis/Dissertation         | 22 cr  | 64 cr  |
+| Research Methodology        |  6 cr  |  6 cr  |
+| Discipline-specific Modules |  9 cr  | 12 cr  |
+| Peer-reviewed Publication   |  3 cr  |  8 cr  |
+|                             | (1 pub)| (2 pub)|
++-----------------------------+--------+--------+
+| Total Credits               | 40 cr  | 90 cr  |
++-----------------------------+--------+--------+
+
+
+Postgraduate Programme Duration Guidelines
+────────────────────────────────────────────────────────────────────────────
+Award Type                    | Minimum Duration     | Maximum Duration
+─────────────────────────────|──────────────────────|──────────────────────────────
+Post-Graduate Certificate     | 1 year               | 2 years
+Post-Graduate Diploma         | 1 year               | 2 years
+Taught Master’s Degree        | 1 year               | 5 years
+Master of Philosophy (MPhil)  | 18 months            | 5 years
+Taught Doctorate              | 3 years              | 7 years
+Doctor of Philosophy (PhD)    | 3 years              | 7 years
+────────────────────────────────────────────────────────────────────────────
+
+Notes:
+- Maximum duration does not include approved Leave of Absence or extenuating circumstances (e.g., illness).
+- Students are required to maintain continuous registration throughout their course of study unless granted leave of absence.
+
+
+Graduate Research Degrees – Calculation of Continuation Fees
+────────────────────────────────────────────────────────────────────────────
+Scenario                                                        | Fee Calculation
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Student has not completed the thesis/dissertation               | 50% of the per credit fee for the thesis +
+                                                                | Ancillary fees (payable once per year)
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Candidate has outstanding modules                               | Full per credit rate for the outstanding modules +
+                                                                | Ancillary fees (payable once per year)
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Student has completed all modules and submitted thesis,         | No continuation fee
+but was not assessed within the required registration period    |
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+
+Taught Graduate Degrees – Continuation Fees
+────────────────────────────────────────────────────────────────────────────
+Scenario                                                        | Fee Calculation
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Student has not completed module(s) within the allowed          | Per credit rate for the outstanding module(s) +
+period of course completion                                     | Ancillary fees (payable once per academic year)
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Student has started but not completed their research project    | 50% of the per credit rate for the research project +
+                                                                | Ancillary fees (payable once per academic year)
+────────────────────────────────────────────────────────────────|──────────────────────────────────────────────────────────
+Student has not completed other course requirements             | Full payment of the cost of the requirement +
+(e.g., externships or internships) within the required period   | Ancillary fees (payable once per academic year)
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+Continuation fees are not applicable for students who have completed their modules and other course requirements within the required period for registration but were not assessed within the maximum registration time. Continuation fees are also not applicable for students where they did not complete their externships/ internships within the required period on account of placement issues. 
+
+GRADING SYSTEM – GRADUATE STUDENTS
+
+The grading system that is applicable to graduate students in taught graduate courses, as well as for the taught components of graduate research degrees (MPhils and PhDs) is found at Section 5.2 Table 1.  
+N.B. Some graduate modules and Theses and Dissertations are assessed on a Pass/Fail basis.  
+The relevant key codes and explanatory notes specified in Section 5.2 Tables 1 and 2 above are applicable to graduate students.
+
+GRADING POLICY
+
+1. The final result for each module is expressed as a grade and grade point. A graduate module will have been passed if the final result is grade B or above.  
+2. A student’s overall academic performance will be determined by weighting each module grade point earned in accordance with its credit allocation and expressed as a Grade Point Average (GPA). The calculation of graduate students’ GPA is the same as set out in Table 4 above.  
+3. Except for special requirements, usually of an external nature, the final grade for a module is determined by weighting the allocation of marks for coursework assignments and final examination.  
+4. If a student has failed a module, he/she must redo the module and the assessment components, including coursework and final examination. The final grade for the module will be the weighted average of new coursework and the new final exam mark.  
+5. Students have a maximum of two opportunities for the assessment of coursework and sitting a final examination in a module.
+
+GRADUATE ACADEMIC AWARDS
+
+To obtain a graduate award, all modules satisfying the conditions stipulated in the course of study must be passed and a Cumulative GPA of at least 3.0 earned. Graduate awards are classified as follows:
+
+Class of Award       Percentage Scale    Minimum Grade Point
+Distinction          80–100              4.0
+Credit               75–79.9             3.67
+Pass                 65–74.9             3.0
+
+Note: For students to be awarded a Credit or Distinction, all modules must be successfully passed on the first attempt. The course of study must be completed within the maximum time frame.
