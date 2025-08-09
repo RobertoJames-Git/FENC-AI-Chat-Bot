@@ -25,7 +25,7 @@ body{
 #sidebar{
     
     background-color: #1f1f1f;
-    width: 240px;
+    width: 200px;
     padding-left:10px;
     padding-right: 10px;
     grid-row: span 2; /* Make sidebar span both rows */
