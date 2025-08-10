@@ -88,3 +88,82 @@ function formatMarkdown(text) {
 
   return html;
 }
+
+
+
+
+async function sendQuestion() {
+    const userInput = document.getElementById("userInput").value.trim();//retrieve what the user entered in the input
+    
+    //do not send a request to the backend if user input is empty
+    if(userInput==""){
+    return;
+    }
+
+    document.getElementById("userInput").value = ""; //clear inpur field after user sends question
+
+    insertUserMessage("user",userInput);//add users message to the container above the textbox
+    document.getElementById("ai_and_user_container").style.display="block";
+    document.getElementById("current_convo_container").style.justifyContent="flex-start";
+    document.getElementById("main_container").style.gridTemplateRows="1fr auto";
+    
+    //scroll to the bottom of the page
+    const container = document.getElementById("current_convo_container");
+    container.scrollTop = container.scrollHeight;
+    
+    //add loading icon
+    const loadingIcon = document.createElement('div');//create div
+    loadingIcon.id='loading_icon'; //add class to div
+    //add loading icon to div with ai and user conversation
+    document.getElementById("ai_and_user_container").appendChild(loadingIcon);
+
+    const res = await fetch("/ask", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ question: userInput })
+    });
+    const data = await res.json();
+    console.log(data);
+    
+    if(data.response){
+    formattedResponse = formatMarkdown(data.response);
+    }
+    else{
+        insertUserMessage("ai_response_error",data.error);
+    }
+
+    //remove loading icon
+    loadingIcon.remove()
+
+    insertUserMessage("ai_response",formattedResponse.trim());
+
+}
+
+
+
+
+
+
+function insertUserMessage(userRole,messageText) {
+    document.getElementById("welcome_message")?.remove();//removes welcome message if it exists
+    if (messageText === "") return; // Avoid empty messages
+
+    // Create the new div
+    const userDiv = document.createElement("div");
+    userDiv.className = userRole;
+    if(userRole === "ai_response"){
+    userDiv.innerHTML = messageText;
+    }
+    else{
+    userDiv.textContent = messageText;
+    }
+
+    // Append to the conversation container
+    const convoContainer = document.getElementById("ai_and_user_container");
+    convoContainer.appendChild(userDiv);
+    const scrollParent = document.getElementById("current_convo_container");
+    scrollParent.scrollTop = scrollParent.scrollHeight;
+
+}

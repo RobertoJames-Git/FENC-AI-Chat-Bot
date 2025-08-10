@@ -1,120 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FENC FAQ Chatbot</title>
-    <link rel="stylesheet" href="static/style.css">
-      <script>
-
-        async function sendQuestion() {
-          const userInput = document.getElementById("userInput").value.trim();//retrieve what the user entered in the input
-          
-          //do not send a request to the backend if user input is empty
-          if(userInput==""){
-            return;
-          }
-
-          document.getElementById("userInput").value = ""; //clear inpur field after user sends question
-
-          insertUserMessage("user",userInput);//add users message to the container above the textbox
-          document.getElementById("ai_and_user_container").style.display="block";
-          document.getElementById("current_convo_container").style.justifyContent="flex-start";
-          document.getElementById("main_container").style.gridTemplateRows="1fr auto";
-          
-          const res = await fetch("/ask", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ question: userInput })
-          });
-          const data = await res.json();
-          console.log(data);
-          
-          if(data.response){
-            formattedResponse = formatMarkdown(data.response);
-          }
-          else{
-             insertUserMessage("ai_response_error",data.error);
-          }
-
-          insertUserMessage("ai_response",formattedResponse.trim());
-        }
-
-
-
-        function insertUserMessage(userRole,messageText) {
-          document.getElementById("welcome_message")?.remove();//removes welcome message if it exists
-          if (messageText === "") return; // Avoid empty messages
-
-          // Create the new div
-          const userDiv = document.createElement("div");
-          userDiv.className = userRole;
-          if(userRole === "ai_response"){
-            userDiv.innerHTML = messageText;
-          }
-          else{
-            userDiv.textContent = messageText;
-          }
-
-          // Append to the conversation container
-          const convoContainer = document.getElementById("ai_and_user_container");
-          convoContainer.appendChild(userDiv);
-          const scrollParent = document.getElementById("current_convo_container");
-          scrollParent.scrollTop = scrollParent.scrollHeight;
-
-        }
-      
-      </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FENC FAQ Chatbot</title>
+  <link rel="stylesheet" href="static/style.css">
+  <script src="static/script.js"></script>
 </head>
 <body>
 
-    <div id="main_container">
-        <div id="sidebar" class="unselectable">
-            <p id="sidebar_heading" class="center">FENC Chatbot</p>
-
-            <div id="new_chat_container"> <img src="static/images/icons8-edit-pencil.svg" alt="" width="20px"> New Chat</div>
-
-            <div id="conversation_history_container">
-                <p>Chats</p>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 1</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 2</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 3</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 4</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 5</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 6</div>
-                <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 7</div>
-                                
-            </div>
-                
-        </div>
-        
-        
-        <div id="current_convo_container">
-            <p id="welcome_message">What can I help with ?</p>
-            <div id="ai_and_user_container">
-
-            </div>
-        </div>
-
-        <div id="user_interaction_container">
-            <div id="user_interaction_items">
-                
-                <div id="textarea_container">
-                    <textarea id="userInput" placeholder="Type your question here..."  rows="1"></textarea>
-                </div>
-
-                <div id="options_container" class="unselectable" >
-                    <img src="static/images/up_arrow.svg" alt="" width="25px" onclick="sendQuestion()">
-                </div>
-
-            </div>
-        </div>
+  <style>
 
 
-    </div>
+  </style>
 
-    <script src="static/script.js"></script>
+
+  <div id="main_container">
+      <div id="sidebar" class="unselectable">
+          <p id="sidebar_heading" class="center">FENC Chatbot</p>
+
+          <div id="new_chat_container"> <img src="static/images/icons8-edit-pencil.svg" alt="" width="20px"> New Chat</div>
+
+          <div id="conversation_history_container">
+              <p>Chats</p>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 1</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 2</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 3</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 4</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 5</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 6</div>
+              <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 7</div>
+                              
+          </div>
+              
+      </div>
+      
+      
+      <div id="current_convo_container">
+          <p id="welcome_message">What can I help with ?</p>
+          <div id="ai_and_user_container">
+
+          </div>
+      </div>
+
+      <div id="user_interaction_container">
+          <div id="user_interaction_items">
+              
+              <div id="textarea_container">
+                  <textarea id="userInput" placeholder="Type your question here..."  rows="1"></textarea>
+              </div>
+
+              <div id="options_container" class="unselectable" >
+                  <img src="static/images/up_arrow.svg" alt="" width="25px" onclick="sendQuestion()">
+              </div>
+
+          </div>
+      </div>
+
+
+  </div>
+
+
 </body>
 </html>
