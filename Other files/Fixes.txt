@@ -1,0 +1,7 @@
+1) Ensure the AI only answers utech related info
+2) I deiliberately did not include the university calendar from the handbook because things like this change frequently
+3) Ensure the AI only answers questions about the university. Nothing more
+4) User message must be no more than 200 char
+5) USer is unable to scroll to the bottom of the page sometime
+
+

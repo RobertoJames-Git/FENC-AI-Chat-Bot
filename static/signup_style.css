@@ -1,0 +1,153 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+}
+
+
+body{
+    background-color: black;
+    color: white;
+    font-family: sans-serif;
+}
+
+#form_container{
+    padding: 15px;
+    border: 2px solid grey;
+    width: 350px;
+    margin: auto;
+    border-radius: 20px;
+    
+}
+
+input{
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    border: none;
+    color: white;
+    height: 25px;
+    background-color: rgb(40, 40, 40);
+    border-radius: 8px;
+    padding-left: 5px;/*indent text from the left*/
+}
+
+input[type='reset'],input[type='submit']{
+    width: 100%;
+    background-color: #1964da;
+    height: 30px;
+    padding: 0px;/*ensure that padding-left is not applied to the reset and submit options*/
+    
+}
+
+input[type='reset']:hover,input[type='submit']:hover,#login_div:hover{
+    outline: 1px solid white;
+    cursor: pointer;
+
+}
+
+input[type='submit']{
+    margin-bottom: 5px;
+}
+
+#form_and_welcome_message_container{
+    display: grid;
+    grid-template-columns: 40% 60%;
+    height: 100%;
+}
+
+#login_div{
+    background-color: #1964da;
+    padding: 5px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+
+.line-text {
+display: flex;
+align-items: center;
+text-align: center;
+margin:10px 0px 10px 0px;
+color: grey;
+}
+
+.line-text::before,
+.line-text::after {
+content: "";
+flex: 1;
+border-top: 1px solid grey;
+}
+
+.line-text::before {
+margin-right: 10px;
+}
+
+.line-text::after {
+margin-left: 10px;
+}
+
+#form_prompt{
+    margin-bottom: 15px;
+    text-align: center;
+}
+.form_wrapper {
+    display: flex;
+    align-items: center; 
+    justify-content: center; 
+    height: 100vh;         
+}
+
+#welcome_container{
+    background-color: #1964da;
+}
+
+#image_and_heading{
+    width: max-content;
+    margin: auto;
+    text-align: center;
+    padding: 10px;
+}
+
+#image_and_heading h1{
+    margin-bottom: 10px;
+}
+
+#image_and_heading_in_form{
+    display: none;
+    grid-template-columns: 75px auto;
+    align-items: center;
+    width: max-content;
+    margin: auto;
+    
+}
+
+
+@media (max-width: 800px) or (orientation: portrait) {
+/* Styles for screens 800px wide or smaller */
+    
+    #welcome_container{
+        display: none;
+    }
+
+    #form_and_welcome_message_container{
+        display: block;
+    }
+
+    #image_and_heading_in_form{
+        display: grid;
+    }
+   
+}
+
+
+.validation{
+    color: red;
+    font-size: 12px;
+}

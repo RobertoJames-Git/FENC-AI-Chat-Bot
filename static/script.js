@@ -107,15 +107,17 @@ async function sendQuestion() {
     document.getElementById("current_convo_container").style.justifyContent="flex-start";
     document.getElementById("main_container").style.gridTemplateRows="1fr auto";
     
-    //scroll to the bottom of the page
-    const container = document.getElementById("current_convo_container");
-    container.scrollTop = container.scrollHeight;
-    
+
     //add loading icon
     const loadingIcon = document.createElement('div');//create div
     loadingIcon.id='loading_icon'; //add class to div
     //add loading icon to div with ai and user conversation
     document.getElementById("ai_and_user_container").appendChild(loadingIcon);
+
+    //scroll to the bottom of the page
+    const container = document.getElementById("current_convo_container");
+    container.scrollTop = container.scrollHeight;
+    
 
     const res = await fetch("/ask", {
     method: "POST",

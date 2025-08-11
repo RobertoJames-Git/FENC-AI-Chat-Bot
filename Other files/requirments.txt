@@ -1,0 +1,8 @@
+python-dotenv
+fastapi==0.110.0
+uvicorn==0.29.0
+passlib[bcrypt]==1.7.4
+bcrypt<4.0.0
+mysql-connector-python==8.3.0
+google-generativeai
+pdfminer.six
