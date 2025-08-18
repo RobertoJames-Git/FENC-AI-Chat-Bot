@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FENC Sign up</title>
+    <title>Login</title>
     <link rel="stylesheet" href="style/signup_style.css">
-    <script src="script/signup.js" defer></script>
+    <script src="script/login.js" defer></script>
 </head>
 <body>
 
@@ -37,23 +37,15 @@
                     <h2>FENC AI Chatbot</h2>
                 </div>
                 
-                <div id="login_div" onclick="location.href='login.html'">Login</div>
+                <div id="login_div" onclick="location.href='signup.html'">Sign up</div>
 
                 <div class="line-text">
                     <p>or</p>
                 </div>
 
-                <p id="form_prompt">Enter you details to create an account</p>
+                <p id="form_prompt">Enter you login detail</p>
 
                 <form action="" method="post">
-
-                    <label for="fnameID">First Name</label>
-                    <span class="validation" id="fname_error"></span>
-                    <input type="text" name="fname" id="fnameID" placeholder="e.g., John">
-                    
-                    <label for="lnmeID">Last Name</label>
-                    <span class="validation" id="lname_error"></span>
-                    <input type="text" name="lname" id="lnameID" placeholder="e.g, Doe">
 
                     <label for="emailID">School Email</label>
                     <span class="validation" id="email_error"></span>
@@ -63,12 +55,8 @@
                     <span class="validation" id="password_error"></span>
                     <input type="password" name="password" id="passwordID" placeholder="at least 8 character with letter, number and symbol">
 
-                    <label for="confirm_password_ID">Confirm Password</label>
-                    <span class="validation" id="confirm_password_error"></span>
-                    <input type="password" name="confirm_password" id="confirm_password_ID" placeholder="Re-enter Password">
-
                     <input type="reset" value="Clear">
-                    <input type="submit" value="Sign Up">
+                    <input type="submit" value="Log in">
                 </form>
             </div>
         </div>

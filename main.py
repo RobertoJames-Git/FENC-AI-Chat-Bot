@@ -1,15 +1,20 @@
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import FastAPI, Request,HTTPException
+from fastapi.responses import HTMLResponse, FileResponse,JSONResponse
 from fastapi.staticfiles import StaticFiles
 from gemini import get_gemini_response
 from google.api_core.exceptions import ResourceExhausted
-from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
-from utility.password_utils import hash_password,verify_password
-from database import database_actions as database_operation
-from pydantic import BaseModel, EmailStr, Field
+from utility.hash_utils import hash_text
+from database.database_actions import process_activation, insert_student
+from starlette.middleware.sessions import SessionMiddleware
+import re 
+from dotenv import load_dotenv
+import os
 
-import re  # For email pattern matching
+# Load environment variables from .env
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
 
 app = FastAPI()
 
@@ -22,17 +27,11 @@ app.add_middleware(
     allow_headers=["*"],   # Allow all HTTP headers
 )
 
-# Pydantic models for request body validation
-class AskQuestionRequest(BaseModel):
-    question: str
-
-class SignupRequest(BaseModel):
-    fname: str
-    lname: str
-    email: EmailStr # FastAPI will validate this is a valid email format
-    password: str = Field(..., min_length=8)
-    confirm_password: str
-
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=SECRET_KEY,  # Keep this secure
+    max_age=3600  # session expires in 1 hour
+)
 
 # Handle chat questions
 chat_history = []
@@ -48,8 +47,11 @@ async def get_index():
 
 
 @app.post("/ask")
-async def ask_question(request_data: AskQuestionRequest):
-    question = request_data.question.strip() # Trim whitespace here
+async def ask_question(request: Request):
+    data = await request.json()
+    question = data.get("question")
+    if not question:
+        return {"error": "Missing question"}
     
 
     try:
@@ -73,22 +75,23 @@ async def ask_question(request_data: AskQuestionRequest):
 # Signup Endpoint - Validation Only 
 # ==============================
 @app.post("/signup")
-async def signup(request_data: SignupRequest):
-    """
-    This endpoint accepts JSON data from the signup form,
-    validates each field, and returns JSON with error messages
-    if any field is invalid.
-    """
+async def signup(request: Request):
 
+    try:
+        # Parse request body (JSON expected)
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+    
     # Dictionary to store validation errors
     errors = {}
 
     # Extract and clean input fields (remove spaces from start/end)
-    fname = request_data.fname.strip()
-    lname = request_data.lname.strip()
-    email = request_data.email.strip()
-    password = request_data.password
-    confirm_password = request_data.confirm_password
+    fname = data.get("fname","").strip()
+    lname = data.get("lname","").strip()
+    email = data.get("email","").strip()
+    password = data.get("password","")
+    confirm_password = data.get("confirm_password","")
 
     # ==============================
     # VALIDATION RULES
@@ -120,7 +123,9 @@ async def signup(request_data: SignupRequest):
         errors["password_error"] = "Password must contain at least one number"
     elif not re.search(r"[!@#$%^&*(),.?\":{}|<>]", password):
         errors["password_error"] = "Password must contain at least one symbol"
-        
+    elif re.search(r"\s", password):
+        errors["password_error"] = "Password must not contain spaces"
+
     # Confirm Password validation
     # Check if password has data in it and its not
     if password and password != confirm_password:
@@ -134,12 +139,49 @@ async def signup(request_data: SignupRequest):
     if errors:
         return JSONResponse(content=errors, status_code=400)
     
-        # Hash password and insert student
-    hashed_password = hash_password(password)
-    result = database_operation.insert_student(email, fname, lname, hashed_password)
+    # Hash password and insert student to database
+    hashed_password = hash_text(password)
+    result = insert_student(email, fname, lname, hashed_password)
 
-    if not result[0]:#check if an error occurred and send it to the frontend
-        return{ result[0]:result[1]}
+    #check if an error occurred from adding the user to the database and send it to the frontend
+    if not result[0]:
+        return JSONResponse(content={"error": result[1]}, status_code=400)
+
     
-    # If no errors, return success message
-    return {"success": result[1]}
+    # Example: Save email to session
+    request.session["student_email"] = email
+
+    # If no errors, Redirect
+    return JSONResponse(content={"redirect": "/email_alert"}, status_code=200)
+
+
+
+@app.get("/activate_account")
+async def activate_account(request: Request):
+    # Extract query parameters from the URL
+    email = request.query_params.get("email")
+    token = request.query_params.get("token")
+
+
+    print(email)
+    # Validate presence of required parameters
+    if not email or not token:
+        raise HTTPException(status_code=400, detail="Missing email or token")
+
+    # Delegate activation logic to database_actions
+    result = process_activation(email, token)
+
+    # return message if database connection fails,
+    if result["status"] == "error":
+        raise HTTPException(status_code=500, detail=result["message"])
+    elif result["status"] == "not_found":
+        raise HTTPException(status_code=404, detail=result["message"])
+    elif result["status"] == "invalid":
+        raise HTTPException(status_code=401, detail=result["message"])
+
+    # Return success, expired, or already_active responses
+    return JSONResponse(content=result, status_code=200)
+
+
+
+

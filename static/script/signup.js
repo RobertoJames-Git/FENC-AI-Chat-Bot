@@ -55,13 +55,10 @@ document.querySelector("form").addEventListener("submit", async function (e) {
         // Step 5: Handle Successful Response
         // ==============================
         else {
-            const result = await res.json(); // Parse success JSON
-            const successMessage = result.success;
-            console.log(successMessage);     // Log success message
-            alert(successMessage); // Show success alert
 
-            // OPTIONAL: Reset the form after success
-            document.querySelector("form").reset();
+            const result = await res.json(); // Parse success JSON
+            // Always redirect if signup is successful
+            window.location.href = result.redirect;
         }
 
     } catch (err) {
@@ -72,3 +69,5 @@ document.querySelector("form").addEventListener("submit", async function (e) {
         alert("Something went wrong. Please try again.");
     }
 });
+
+

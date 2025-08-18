@@ -6,3 +6,9 @@ bcrypt<4.0.0
 mysql-connector-python==8.3.0
 google-generativeai
 pdfminer.six
+itsdangerous>=2.1.2
+
+
+
+
+
