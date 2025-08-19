@@ -1,11 +1,12 @@
 from fastapi import FastAPI, Request,HTTPException
 from fastapi.responses import HTMLResponse, FileResponse,JSONResponse
+from datetime import datetime, timedelta
 from fastapi.staticfiles import StaticFiles
 from gemini import get_gemini_response
 from google.api_core.exceptions import ResourceExhausted
 from fastapi.middleware.cors import CORSMiddleware
 from utility.hash_utils import hash_text
-from database.database_actions import process_activation, insert_student
+from database.database_actions import process_activation, insert_student, email_exist
 from starlette.middleware.sessions import SessionMiddleware
 import re 
 from dotenv import load_dotenv
@@ -106,11 +107,16 @@ async def signup(request: Request):
         errors["lname_error"] = "Last name is required"
 
     # Email validation
+
     if not email:
         errors["email_error"] = "Email is required"
     elif not re.match(r"^[\w\.-]+@students\.utech\.edu\.jm$", email):
         # Pattern ensures the email ends with @students.utech.edu.jm
-        errors["email_error"] = "Must be a valid UTech student email"
+        errors["email_error"] = "Must be a valid UTECH student email"
+    else:
+        email_result = email_exist(email)  # Only check existence if format is valid
+        if email_result["status"] == "exists" or email_result["status"] == "error":
+            errors["email_error"] = email_result["message"]
 
     # Password validation
     if not password:
@@ -152,26 +158,70 @@ async def signup(request: Request):
     request.session["student_email"] = email
 
     # If no errors, Redirect
-    return JSONResponse(content={"redirect": "/email_alert"}, status_code=200)
+    return JSONResponse(content={"redirect": "/static/mail.html"}, status_code=200)
 
 
 
-@app.get("/activate_account")
+
+
+@app.post("/activate_account")
 async def activate_account(request: Request):
-    # Extract query parameters from the URL
-    email = request.query_params.get("email")
-    token = request.query_params.get("token")
+    data = await request.json()
+    email = data.get("email")
+    token = data.get("token")
 
-
-    print(email)
-    # Validate presence of required parameters
     if not email or not token:
         raise HTTPException(status_code=400, detail="Missing email or token")
 
-    # Delegate activation logic to database_actions
+    now = datetime.now()
+
+    # 🔒 Check for active lockout
+    lockout_until = request.session.get("activation_lockout_until")
+    if lockout_until:
+        try:
+            lockout_time = datetime.fromisoformat(lockout_until)
+            if now < lockout_time:
+                return JSONResponse(
+                    content={"error": "Too many attempts. Please wait 1 minute before trying again."},
+                    status_code=429
+                )
+        except ValueError:
+            # Malformed lockout timestamp — clear it
+            request.session.pop("activation_lockout_until", None)
+
+    # 🧮 Attempt tracking
+    window_start = request.session.get("activation_window_start")
+    attempt_count = request.session.get("activation_attempt_count", 0)
+
+    if window_start:
+        try:
+            start_time = datetime.fromisoformat(window_start)
+            if now - start_time < timedelta(minutes=1):
+                if attempt_count >= 5:
+                    # Set lockout for 1 minute
+                    request.session["activation_lockout_until"] = (now + timedelta(minutes=1)).isoformat()
+                    return JSONResponse(
+                        content={"error": "Too many attempts. Please wait 1 minute before trying again."},
+                        status_code=429
+                    )
+                else:
+                    request.session["activation_attempt_count"] = attempt_count + 1
+            else:
+                # Window expired — reset
+                request.session["activation_window_start"] = now.isoformat()
+                request.session["activation_attempt_count"] = 1
+        except ValueError:
+            # Malformed timestamp — reset
+            request.session["activation_window_start"] = now.isoformat()
+            request.session["activation_attempt_count"] = 1
+    else:
+        # First attempt — initialize
+        request.session["activation_window_start"] = now.isoformat()
+        request.session["activation_attempt_count"] = 1
+
+    # 🚀 Proceed with activation logic
     result = process_activation(email, token)
 
-    # return message if database connection fails,
     if result["status"] == "error":
         raise HTTPException(status_code=500, detail=result["message"])
     elif result["status"] == "not_found":
@@ -179,9 +229,12 @@ async def activate_account(request: Request):
     elif result["status"] == "invalid":
         raise HTTPException(status_code=401, detail=result["message"])
 
-    # Return success, expired, or already_active responses
     return JSONResponse(content=result, status_code=200)
 
 
 
+@app.get("/activate", response_class=HTMLResponse)
+async def serve_activate_page():
+    return FileResponse("static/activate.html")
 
+ 

@@ -20,7 +20,7 @@ def send_activation_email(fname: str, lname: str, to_email: str, token: str) -> 
         msg["To"] = to_email
 
         # Activation link
-        activation_link = f"http://127.0.0.1:8000/activate?token={token}&email={to_email}"
+        activation_link = f"http://127.0.0.1:8000/static/activate.html?token={token}&email={to_email}"
 
         # HTML content with inline styles
         html_content = f"""
@@ -62,6 +62,9 @@ def send_activation_email(fname: str, lname: str, to_email: str, token: str) -> 
             server.login(EMAIL_ADDRESS, EMAIL_PASSWORD)
             server.send_message(msg)
 
+        #debug
+        print("email sent to " + to_email)
+        
         return True
 
     except Exception as e:

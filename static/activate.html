@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate Email</title>
+</head>
+<body>
+    
+<style>
+
+* {
+margin: 0;
+padding: 0;
+}
+
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;  /* horizontal centering */
+    align-items: center;      /* vertical centering */
+    background-color: black;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+#activation_container{
+    width: 500px;
+    border: 2px solid #1964da;
+    padding: 10px;
+    text-align: center;
+    border-radius: 15px;
+}
+
+button{
+    background-color: #1964da;
+    border: none;
+    color: white;
+    padding: 5px;
+}
+
+#button_container{
+    border-top: 1px solid grey;
+}
+
+#button_container button{
+    margin-top: 10px;
+    width: 100%;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#button_container button:hover{
+    outline: 1px solid white;
+    cursor: pointer;
+
+}
+
+#msg_from_backend{
+    margin-top: 10px;
+}
+
+#loading_icon {
+    width: 20px;
+    height: 20px;
+    border: 4px solid #1946da;
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+    margin: auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+    </style>
+
+
+
+<script>
+  // Function to extract email and token from URL and send POST request
+  async function activateAccount() {
+    // Parse query parameters from the current page URL
+    const params = new URLSearchParams(window.location.search);
+    const email = params.get("email");
+    const token = params.get("token");
+
+    // Basic validation: ensure both parameters are present
+    if (!email || !token) {
+      console.error("Missing email or token in URL");
+      return;
+    }
+
+    try {
+      // Send POST request to FastAPI backend with email and token
+      const response = await fetch("http://127.0.0.1:8000/activate_account", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ email, token })
+      });
+
+        // Parse JSON response from backend
+        const result = await response.json();
+        const loading_div = document.getElementById("loading_icon")
+        loading_div.remove();
+
+        const backend_msg = document.getElementById("msg_from_backend")
+
+      // Log result based on response status
+      if (!response.ok) {
+        console.error("Activation failed:", result);
+        backend_msg.style.color='white';
+        backend_msg.style.backgroundColor='rgb(100,80,80)';
+        backend_msg.style.padding ='10px';
+        backend_msg.style.borderRadius ='5px';
+        backend_msg.style.borderLeft='20px solid red';
+        backend_msg.innerHTML=result.error;
+
+      } else {
+        console.log("Activation successful:", result);
+        backend_msg.style.color='white';
+        backend_msg.style.backgroundColor='rgb(80,100,80)';
+        backend_msg.style.padding ='10px';
+        backend_msg.style.borderRadius ='5px';
+        backend_msg.style.borderLeft='20px solid green';
+        backend_msg.innerHTML=result.message;
+
+      }
+    } catch (err) {
+      // Handle network or server errors
+      console.error("Network error:", err);
+    }
+  }
+
+  // Automatically run activation logic when page loads
+  window.onload = activateAccount;
+</script>
+
+    <div id="activation_container">
+        <img src="images/email.png" alt="">
+        <h2>Email Verification</h2>
+        <div id="msg_from_backend">
+
+            <div id="loading_icon"></div>
+
+        </div>
+        <br>
+
+        <div id="button_container">
+            <button onclick="location.href='login.html'">Back to login</button>
+        </div>
+    </div>
+</body>
+</html>

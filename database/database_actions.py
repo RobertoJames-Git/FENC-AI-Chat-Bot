@@ -5,6 +5,27 @@ from utility.send_mail import send_activation_email
 import uuid
 import datetime
 
+def email_exist(email: str):
+    conn = get_db_connection()
+    if conn is None:
+        return {"status": "database error", "message": "Unable to check if email is already registered"}
+
+    try:
+        cursor = conn.cursor()
+        sql = "SELECT COUNT(*) FROM students WHERE email = %s"
+        cursor.execute(sql, (email,))
+        count = cursor.fetchone()[0]
+        cursor.close()
+        conn.close()
+
+        if count > 0:
+            return {"status": "exists", "message": "Email is already registered"}
+        else:
+            return {"status": "available", "message": "Email is not registered"}
+    except Exception as e:
+        return {"status": "error", "message": "Database query failed"}
+ 
+
 def insert_student(email: str, fname: str, lname: str, plain_password: str) -> list:
     conn = get_db_connection()
     if conn is None:
@@ -19,7 +40,7 @@ def insert_student(email: str, fname: str, lname: str, plain_password: str) -> l
         # Generate and hash token
         raw_token = uuid.uuid4().hex
         hashed_token = hash_text(raw_token)  # bcrypt hash
-
+        
         # Call stored procedure
         cursor.callproc("insert_student_with_activation", (email, fname, lname, hashed_password, hashed_token))
 
@@ -42,6 +63,7 @@ def insert_student(email: str, fname: str, lname: str, plain_password: str) -> l
 
 
 def process_activation(email: str, token: str):
+    
     # Establish database connection
     conn = get_db_connection()
     if conn is None:
@@ -73,11 +95,18 @@ def process_activation(email: str, token: str):
 
             # Update token and timestamp in DB
             cursor.execute("UPDATE student_account_activation SET token = %s, token_sent = NOW() WHERE email = %s",
-                           (hashed_new_token, email))
+                           (hashed_new_token, email,))
             conn.commit()
 
+            #get fname and lname
+            cursor.execute("select fname,lname from students where email = %s",(email,))
+            student_info = cursor.fetchone()
+
+            if not student_info:
+                return {"status": "error", "message": "Student record not found"}
+
             # Resend activation email with new token
-            send_activation_email("Student", "", email, new_token)
+            send_activation_email(student_info["fname"], student_info["lname"], email, new_token)
 
             return {"status": "expired", "message": "Token expired. A new link has been sent."}
 
