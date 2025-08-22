@@ -28,10 +28,7 @@
         </div>
 
         <div class="form_wrapper">
-
-
             <div id="form_container">
-
                 <div id="image_and_heading_in_form">
                     <img src="images/chatbot.png" alt="" width="70px">
                     <h2>FENC AI Chatbot</h2>
@@ -43,9 +40,15 @@
                     <p>or</p>
                 </div>
 
+
+
+
+
                 <p id="form_prompt">Enter you login detail</p>
 
-                <form action="" method="post">
+                <p id="timeout_message"></p>
+
+                <form action="" method="post" id="verify_credentials">
 
                     <label for="emailID">School Email</label>
                     <span class="validation" id="email_error"></span>

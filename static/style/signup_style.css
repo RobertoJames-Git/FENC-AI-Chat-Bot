@@ -151,3 +151,17 @@ margin-left: 10px;
     color: red;
     font-size: 12px;
 }
+
+
+
+#timeout_message{
+    background-color: rgb(100,80,80);
+    border-left: 15px solid red;
+    padding: 5px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    display: none;
+}
+
+
+

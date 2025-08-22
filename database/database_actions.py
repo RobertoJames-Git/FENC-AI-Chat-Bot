@@ -60,6 +60,35 @@ def insert_student(email: str, fname: str, lname: str, plain_password: str) -> l
         conn.close()
 
 
+def get_hashed_password_and_fullname(email:str):
+
+    conn = get_db_connection()
+
+    if conn is None:
+        return {"status": "db_error", "message": "Database connection failed"}
+    try:
+        cursor = conn.cursor()
+        sql="select fname, lname, password from students where email = %s"
+        
+        cursor.execute(sql,(email,))
+        record = cursor.fetchone()
+        
+        #check if a record was not returned from the database return None
+        if record is None:
+            return {"status":"invalid_credentials","message":"Email and / or password is incorrect"}
+        
+        # return the record that was found
+        return {"status":"success","fullname":record[0] + " " +record[1], "hash_pwd":record[2]} 
+
+
+    except Error as e:
+        print("Database error : " , str(e))
+        return {"status": "db_error", "message": "Database query failed"}
+    finally : 
+        cursor.close()
+        conn.close()
+
+
 
 
 def process_activation(email: str, token: str):

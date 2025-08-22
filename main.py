@@ -5,8 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from gemini import get_gemini_response
 from google.api_core.exceptions import ResourceExhausted
 from fastapi.middleware.cors import CORSMiddleware
-from utility.hash_utils import hash_text
-from database.database_actions import process_activation, insert_student, email_exist
+from utility.hash_utils import hash_text,verify_hash
+from database.database_actions import process_activation, insert_student, email_exist, get_hashed_password_and_fullname
 from starlette.middleware.sessions import SessionMiddleware
 import re 
 from dotenv import load_dotenv
@@ -90,7 +90,7 @@ async def signup(request: Request):
     # Extract and clean input fields (remove spaces from start/end)
     fname = data.get("fname","").strip()
     lname = data.get("lname","").strip()
-    email = data.get("email","").strip()
+    email = data.get("email","").lower().strip()#put email in lowercase
     password = data.get("password","")
     confirm_password = data.get("confirm_password","")
 
@@ -101,10 +101,14 @@ async def signup(request: Request):
     # First Name validation
     if not fname:
         errors["fname_error"] = "First name is required"
+    elif not fname.isalpha(): #ensure lname contains only letters
+        errors["fname_error"] = "First name must contain only letters"
 
     # Last Name validation
     if not lname:
         errors["lname_error"] = "Last name is required"
+    elif not lname.isalpha(): #ensure lname contains only letters
+        errors["lname_error"] = "Last name must contain only letters"
 
     # Email validation
 
@@ -117,6 +121,15 @@ async def signup(request: Request):
         email_result = email_exist(email)  # Only check existence if format is valid
         if email_result["status"] == "exists" or email_result["status"] == "error":
             errors["email_error"] = email_result["message"]
+
+        else:
+            email_split = email.split("@")
+            email_username = email_split[0]#username for the email ***@students.xyz.....
+
+            if (len(email_username)<=3): 
+                errors["email_error"]="Email is invalid"
+
+
 
     # Password validation
     if not password:
@@ -175,7 +188,7 @@ async def activate_account(request: Request):
 
     now = datetime.now()
 
-    # 🔒 Check for active lockout
+    # Check for active lockout
     lockout_until = request.session.get("activation_lockout_until")
     if lockout_until:
         try:
@@ -189,7 +202,7 @@ async def activate_account(request: Request):
             # Malformed lockout timestamp — clear it
             request.session.pop("activation_lockout_until", None)
 
-    # 🧮 Attempt tracking
+    # Attempt tracking
     window_start = request.session.get("activation_window_start")
     attempt_count = request.session.get("activation_attempt_count", 0)
 
@@ -238,3 +251,110 @@ async def serve_activate_page():
     return FileResponse("static/activate.html")
 
  
+
+
+@app.post("/verify_login")
+async def verify_login(request: Request):
+    # Attempt to parse incoming JSON payload
+    try:
+        data = await request.json()
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid JSON body")
+
+    # Dictionary to collect validation errors
+    errors = {}
+
+    # Extract and sanitize input fields
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
+
+    # Validate email format and domain
+    if not email:
+        errors["email_error"] = "Email is required"
+    elif not re.match(r"^[\w\.-]+@students\.utech\.edu\.jm$", email):
+        errors["email_error"] = "Must be a valid UTECH student email"
+
+    # Validate password presence and length
+    if not password:
+        errors["password_error"] = "Password is required"
+    elif len(password) < 8:
+        errors["password_error"] = "Password is invalid"
+
+    # If any validation errors exist, return them immediately
+    if errors:
+        return JSONResponse(content=errors, status_code=400)
+
+    # Retrieve login attempt count and lockout timestamp from session
+    user_attempts = request.session.get("student_login_attempt", 5)
+    lockout_start = request.session.get("student_login_lockout_start")
+    
+
+    # If user has exhausted attempts, check if cooldown is still active
+    if user_attempts <= 0:
+        if lockout_start:
+            try:
+                # Parse stored timestamp and calculate remaining cooldown
+                lockout_time = datetime.fromisoformat(lockout_start)
+                now = datetime.now()
+                cooldown_duration = timedelta(minutes=5)#set cooldown duration to 5 minutes
+                time_left = (lockout_time + cooldown_duration - now).total_seconds()
+
+                # If cooldown is still active, return timeout response
+                if time_left > 0:
+                    return JSONResponse(content={"status": "timeout","message": "Too many requests. Try again in ","time_left": int(time_left)}, status_code=429)
+                else:
+                    # Cooldown expired — reset attempts and clear lockout
+                    request.session["student_login_attempt"] = 5
+                    request.session.pop("student_login_lockout_start", None)
+            except ValueError:
+                # If timestamp is malformed, reset everything defensively
+                request.session["student_login_attempt"] = 5
+                request.session.pop("student_login_lockout_start", None)
+
+    # Attempt to retrieve credentials from database
+    credentials_error = "Email and / or password is incorrect"
+    result = get_hashed_password_and_fullname(email)
+
+    # Handle invalid credentials
+    if result["status"] == "invalid_credentials":
+        request.session["student_login_attempt"] -= 1
+
+        # If attempts hit zero, start cooldown timer
+        if request.session["student_login_attempt"] <= 0:
+            request.session["student_login_lockout_start"] = datetime.now().isoformat()
+
+        # Return generic error to avoid revealing which field was wrong
+        errors["email_error"] = credentials_error
+        errors["password_error"] = credentials_error
+        return JSONResponse(content=errors, status_code=401)
+
+    # Handle database errors gracefully
+    elif result["status"] == "db_error":
+        request.session["student_login_attempt"] -= 1
+        errors["email_error"] = result["message"]
+        errors["password_error"] = result["message"]
+        return JSONResponse(content=errors, status_code=500)
+
+    # Verify password against stored hash
+    hashed_password = result["hash_pwd"]
+    if verify_hash(password, hashed_password):
+        # Successful login — clear session tracking and store user info
+        request.session.pop("student_login_attempt", None)
+        request.session.pop("student_login_lockout_start", None)
+        request.session["student_email"] = email
+        request.session["fullname"] = result["fullname"]
+        return JSONResponse(content={"message": "Login Successful"}, status_code=200)
+
+    # Password mismatch — decrement attempts and possibly start cooldown
+    request.session["student_login_attempt"] -= 1
+    if request.session["student_login_attempt"] <= 0:
+        request.session["student_login_lockout_start"] = datetime.now().isoformat()
+
+    errors["email_error"] = credentials_error
+    errors["password_error"] = credentials_error
+    return JSONResponse(content=errors, status_code=401)
+
+
+
+
+
