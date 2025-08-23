@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request,HTTPException
+from fastapi import FastAPI, Request,HTTPException,Response
 from fastapi.responses import HTMLResponse, FileResponse,JSONResponse
 from datetime import datetime, timedelta
 from fastapi.staticfiles import StaticFiles
@@ -284,13 +284,17 @@ async def verify_login(request: Request):
     if errors:
         return JSONResponse(content=errors, status_code=400)
 
+
+        #initalize session to 5 if it does not exist
+    if "student_login_attempt" not in request.session:
+        request.session["student_login_attempt"] = 5
     # Retrieve login attempt count and lockout timestamp from session
     user_attempts = request.session.get("student_login_attempt", 5)
     lockout_start = request.session.get("student_login_lockout_start")
     
 
     # If user has exhausted attempts, check if cooldown is still active
-    if user_attempts <= 0:
+    if user_attempts <= 1:
         if lockout_start:
             try:
                 # Parse stored timestamp and calculate remaining cooldown
@@ -300,7 +304,7 @@ async def verify_login(request: Request):
                 time_left = (lockout_time + cooldown_duration - now).total_seconds()
 
                 # If cooldown is still active, return timeout response
-                if time_left > 0:
+                if time_left > 1:
                     return JSONResponse(content={"status": "timeout","message": "Too many requests. Try again in ","time_left": int(time_left)}, status_code=429)
                 else:
                     # Cooldown expired — reset attempts and clear lockout
@@ -315,17 +319,20 @@ async def verify_login(request: Request):
     credentials_error = "Email and / or password is incorrect"
     result = get_hashed_password_and_fullname(email)
 
+
+
     # Handle invalid credentials
     if result["status"] == "invalid_credentials":
         request.session["student_login_attempt"] -= 1
 
         # If attempts hit zero, start cooldown timer
-        if request.session["student_login_attempt"] <= 0:
+        if request.session["student_login_attempt"] <= 1:
             request.session["student_login_lockout_start"] = datetime.now().isoformat()
 
         # Return generic error to avoid revealing which field was wrong
         errors["email_error"] = credentials_error
         errors["password_error"] = credentials_error
+        errors["login_attempts"] = request.session["student_login_attempt"]
         return JSONResponse(content=errors, status_code=401)
 
     # Handle database errors gracefully
@@ -333,6 +340,7 @@ async def verify_login(request: Request):
         request.session["student_login_attempt"] -= 1
         errors["email_error"] = result["message"]
         errors["password_error"] = result["message"]
+        errors["login_attempts"] = request.session["student_login_attempt"]
         return JSONResponse(content=errors, status_code=500)
 
     # Verify password against stored hash
@@ -352,9 +360,13 @@ async def verify_login(request: Request):
 
     errors["email_error"] = credentials_error
     errors["password_error"] = credentials_error
+    errors["login_attempts"] = request.session["student_login_attempt"]
     return JSONResponse(content=errors, status_code=401)
 
 
 
 
-
+@app.post("/logout")
+def logout(response: Response):
+    response.delete_cookie("session")  # clears the session cookie
+    return {"message": "Logged out"}

@@ -7,3 +7,5 @@ Note: STUDENTS’ UNION COUNCIL MEMBERS was not added as this can change every a
 6) check if user accout is_active before logging in
 7) Add loading icon on signup screen
 8) Alert user of session expiration and ensure they are unable to do any actions
+9) On the login page when the user is over 5 attempts the time should countdown
+10) Give sessions a timelimit

@@ -10,7 +10,8 @@ document.addEventListener("DOMContentLoaded", () => {
         document.getElementById("email_error").textContent = "";
         document.getElementById("password_error").textContent = "";
         document.getElementById("timeout_message").style.display = 'none';
-        document.getElementById("timeout_message").innerHTML = "";
+        document.getElementById("time_left").style.display = 'none';
+        document.getElementById("time_left").innerHTML = "";
 
         // Extract values from input fields
         const email = document.getElementById("emailID").value.trim();
@@ -39,7 +40,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 if(result.status && result.status =="timeout"){
                     document.getElementById("timeout_message").style.display = 'block';
-                    document.getElementById("timeout_message").innerHTML = result.message + result.time_left +" s";
+                    document.getElementById("time_left").style.display = 'inline';
+                    startCountdown(result.time_left,result.message);
+
                 }
             } else {
                 // If login is successful, redirect or show success message
@@ -54,3 +57,32 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+
+
+
+
+function startCountdown(secondsLeft,message) {
+  const countdownElement = document.getElementById("time_left");
+  let timerInterval; // outer scope, so clearInterval works
+
+  const updateTimer = () => {
+    if (!countdownElement) return; // safety check
+
+    if (secondsLeft <= 0) {
+        document.getElementById("timeout_message").style.display = 'none';
+        document.getElementById("time_left").style.display = 'none';
+        document.getElementById("time_left").innerHTML = "";
+      clearInterval(timerInterval); 
+      return;
+    }
+
+    const minutes = Math.floor(secondsLeft / 60);
+    const seconds = secondsLeft % 60;
+
+    countdownElement.innerHTML = `${message} ${minutes}:${seconds.toString().padStart(2, '0')}`;
+    secondsLeft--;
+  };
+
+  updateTimer(); 
+  timerInterval = setInterval(updateTimer, 1000);
+}
