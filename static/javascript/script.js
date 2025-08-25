@@ -138,13 +138,10 @@ async function sendQuestion() {
 
     //remove loading icon
     loadingIcon.remove()
-
     insertUserMessage("ai_response",formattedResponse.trim());
 
+    
 }
-
-
-
 
 
 
@@ -169,3 +166,57 @@ function insertUserMessage(userRole,messageText) {
     scrollParent.scrollTop = scrollParent.scrollHeight;
 
 }
+
+
+
+const nameContainer = document.getElementById("name_container");
+const popupMenu = document.getElementById("popup_menu");
+
+nameContainer.addEventListener("click", () => {
+  //check if popup is visible and if it is make it not visible
+  //else if it is not visible then make it visible
+  if (popupMenu.style.display === "block") {
+    popupMenu.style.display = "none";
+  } else {
+    popupMenu.style.display = "block";
+  }
+
+});
+
+// hide when clicking outside
+document.addEventListener("click", (e) => {
+  if (!nameContainer.contains(e.target) && !popupMenu.contains(e.target)) {
+    popupMenu.style.display = "none";
+  }
+});
+
+
+document.addEventListener("DOMContentLoaded", function () {
+  const logoutDiv = document.getElementById("logout_container");
+
+  if (logoutDiv) {
+    logoutDiv.addEventListener("click", async function () {
+      try {
+        const response = await fetch("/logout", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.redirect) {
+          window.location.href = "/" + data.redirect;
+        } else {
+          alert("Logout successful, but no redirect provided.");
+        }
+      } catch (error) {
+        console.error("Logout failed:", error);
+        alert("An error occurred while logging out.");
+      }
+    });
+  }
+});
+
+

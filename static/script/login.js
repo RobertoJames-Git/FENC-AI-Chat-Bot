@@ -45,8 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 }
             } else {
-                // If login is successful, redirect or show success message
-                alert(result.message); // You can replace this with a redirect if needed
+                // If login is successful, redirect to chatbt
                 window.location.href = "/"; // redirect to index
             }
 
@@ -86,3 +85,6 @@ function startCountdown(secondsLeft,message) {
   updateTimer(); 
   timerInterval = setInterval(updateTimer, 1000);
 }
+
+
+

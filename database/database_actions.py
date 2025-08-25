@@ -67,6 +67,7 @@ def get_hashed_password_and_fullname(email:str):
     if conn is None:
         return {"status": "db_error", "message": "Database connection failed"}
     try:
+        print("Emil in db " + email)
         cursor = conn.cursor()
         sql="select fname, lname, password from students where email = %s"
         

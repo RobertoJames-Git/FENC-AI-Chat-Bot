@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request,HTTPException,Response
-from fastapi.responses import HTMLResponse, FileResponse,JSONResponse
+from fastapi.responses import HTMLResponse, FileResponse,JSONResponse,RedirectResponse
 from datetime import datetime, timedelta
 from fastapi.staticfiles import StaticFiles
 from gemini import get_gemini_response
@@ -11,6 +11,9 @@ from starlette.middleware.sessions import SessionMiddleware
 import re 
 from dotenv import load_dotenv
 import os
+from fastapi.templating import Jinja2Templates
+
+
 
 # Load environment variables from .env
 load_dotenv()
@@ -36,14 +39,33 @@ app.add_middleware(
 
 # Handle chat questions
 chat_history = []
- 
+
+templates = Jinja2Templates(directory="templates")
+
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Serve index.html at root
 @app.get("/", response_class=HTMLResponse)
-async def get_index():
-    return FileResponse("index.html")
+async def get_index(request: Request):
+
+    #retrieve user email and fullname from session
+    email = request.session.get("student_email")
+    fullname = request.session.get("fullname")
+
+    #if any of them are empty then the user is redirected to the login page
+    if email is None or fullname is None:
+        return RedirectResponse(url="/static/login.html")
+
+    result=fullname.split()
+    fname=result[0]
+    lname=result[1]
+    return templates.TemplateResponse("index.html", {
+        "request": request,
+        "email": email,
+        "fname": fname,
+        "lname": lname
+    })
 
 
 
@@ -111,7 +133,6 @@ async def signup(request: Request):
         errors["lname_error"] = "Last name must contain only letters"
 
     # Email validation
-
     if not email:
         errors["email_error"] = "Email is required"
     elif not re.match(r"^[\w\.-]+@students\.utech\.edu\.jm$", email):
@@ -128,7 +149,6 @@ async def signup(request: Request):
 
             if (len(email_username)<=3): 
                 errors["email_error"]="Email is invalid"
-
 
 
     # Password validation
@@ -150,6 +170,7 @@ async def signup(request: Request):
     if password and password != confirm_password:
         errors["confirm_password_error"] = "Passwords do not match"
 
+
     # ==============================
     # RETURNING ERRORS OR SUCCESS
     # ==============================
@@ -158,9 +179,7 @@ async def signup(request: Request):
     if errors:
         return JSONResponse(content=errors, status_code=400)
     
-    # Hash password and insert student to database
-    hashed_password = hash_text(password)
-    result = insert_student(email, fname, lname, hashed_password)
+    result = insert_student(email, fname, lname, password)
 
     #check if an error occurred from adding the user to the database and send it to the frontend
     if not result[0]:
@@ -320,7 +339,6 @@ async def verify_login(request: Request):
     result = get_hashed_password_and_fullname(email)
 
 
-
     # Handle invalid credentials
     if result["status"] == "invalid_credentials":
         request.session["student_login_attempt"] -= 1
@@ -369,4 +387,10 @@ async def verify_login(request: Request):
 @app.post("/logout")
 def logout(response: Response):
     response.delete_cookie("session")  # clears the session cookie
-    return {"message": "Logged out"}
+    return {"message": "Logged out", "redirect":"static/login.html"}
+
+
+
+
+
+

@@ -22,14 +22,14 @@ body{
     height: 100vh;  
 }
 
-#sidebar{
-    
+#sidebar {
+    display: flex;
+    flex-direction: column;   /* Stack children vertically */
+    justify-content: space-between; /* Push last item (logout) to bottom */
     background-color: #1f1f1f;
-    width: 200px;
-    padding-left:10px;
-    padding-right: 10px;
-    grid-row: span 2; /* Make sidebar span both rows */
-    
+    width: 220px;
+    padding: 10px;
+    grid-row: span 2; /* Sidebar spans both rows */
 }
 
 
@@ -83,11 +83,10 @@ body{
 
 
 
-#sidebar > *{
-    margin-bottom: 30px;
-
+#sidebar_heading,
+#new_chat_container {
+  margin-bottom: 30px; /* only these need spacing */
 }
-
 
 
 
@@ -311,4 +310,72 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 
 @keyframes spin {
     to { transform: rotate(360deg); }
+}
+
+
+.menu_items{
+  display: flex;
+  align-items: center;
+  background-color: #424242;
+  padding: 8px;
+  border-radius: 5px;
+  border-left: 5px solid #1946da;
+  cursor: pointer;
+  transition: 0.5s ease border-left;
+}
+
+.menu_items:hover{
+  border-left: 20px solid #1946da;
+}
+
+#logout_container{
+
+}
+
+
+#name_container {
+  align-items: center;
+  max-width: 210px; /* or whatever width fits your layout */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  gap: 8px;
+}
+
+
+
+#menu_wrapper {
+  position: relative; /* anchor for absolute positioning */
+  display: inline-block;
+}
+
+#popup_menu {
+  position: absolute;
+  bottom: 110%; /* place it above the name_container */
+  left: 0;
+  background: #2c2c2c;
+  border-radius: 8px;
+  padding: 10px;
+  display: none; /* hidden by default */
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  z-index: 10;
+  width: 200px;
+  outline: 2px solid rgb(150,150,150);
+}
+
+
+
+#user_email{
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  max-width: 190px; /* or whatever width fits your layout */
+  margin-bottom: 10px;
+
+}
+
+#email_text{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
 }

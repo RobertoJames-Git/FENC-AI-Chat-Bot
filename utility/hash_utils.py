@@ -10,3 +10,5 @@ def hash_text(text: str) -> str:
 def verify_hash(plain_text: str, hashed_text: str) -> bool:
     """Verify a plain-text password against its hashed version."""
     return pwd_context.verify(plain_text, hashed_text)
+
+

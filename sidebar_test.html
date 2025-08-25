@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sidebar with Logout</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh; /* full height */
+    }
+
+    /* Sidebar styling */
+    .sidebar {
+      width: 220px;
+      height: 100vh; /* full height */
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column; /* stack items vertically */
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .sidebar a {
+      text-decoration: none;
+      color: white;
+      padding: 10px 0;
+      display: block;
+    }
+
+    .sidebar a:hover {
+      background-color: #34495e;
+      border-radius: 5px;
+      padding-left: 10px;
+    }
+
+    /* Logout button pinned to bottom */
+    .logout {
+      margin-top: auto; /* pushes this link to the bottom */
+      background-color: #e74c3c;
+      text-align: center;
+      padding: 12px;
+      border-radius: 5px;
+    }
+
+    .logout:hover {
+      background-color: #c0392b;
+    }
+
+    /* Main content area */
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <a href="#">Dashboard</a>
+    <a href="#">Profile</a>
+    <a href="#">Settings</a>
+    
+    <a href="#" class="logout">Logout</a>
+  </div>
+
+  <div class="content">
+    <h1>Welcome!</h1>
+    <p>Your main content goes here.</p>
+  </div>
+</body>
+</html>
