@@ -2,10 +2,11 @@
 2) I deiliberately did not include the university calendar from the handbook because things like this change frequently
 3) Ensure the AI only answers questions about the university. Nothing more
 4) Trim user input before it comes to the AI. Ensure user input is not filled wit white spaces
-5) On successful a pop up should show in the top midddle of the screen
 Note: STUDENTS’ UNION COUNCIL MEMBERS was not added as this can change every academic year
 6) check if user accout is_active before logging in
 7) Add loading icon on signup screen
 8) Alert user of session expiration and ensure they are unable to do any actions
 9) On the login page when the user is over 5 attempts the time should countdown
 10) Give sessions a timelimit
+
+11) User should have an option to resent activation link if they did not get it

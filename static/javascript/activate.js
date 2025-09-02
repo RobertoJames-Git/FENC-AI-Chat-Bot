@@ -31,16 +31,17 @@ try {
 
     // Log result based on response status
     if (!response.ok) {
-    console.error("Activation failed:", result);
+    console.error("Activation failed: " + result);
     backend_msg.style.color='white';
     backend_msg.style.backgroundColor='rgb(100,80,80)';
     backend_msg.style.padding ='10px';
     backend_msg.style.borderRadius ='5px';
     backend_msg.style.borderLeft='20px solid red';
-    backend_msg.innerHTML=result.error;
+    backend_msg.innerHTML=result.message;
+
 
     } else {
-    console.log("Activation successful:", result);
+    console.log("Activation successful:" , result);
     backend_msg.style.color='white';
     backend_msg.style.backgroundColor='rgb(80,100,80)';
     backend_msg.style.padding ='10px';

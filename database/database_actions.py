@@ -24,7 +24,29 @@ def email_exist(email: str):
             return {"status": "available", "message": "Email is not registered"}
     except Exception as e:
         return {"status": "error", "message": "Database query failed"}
- 
+
+def account_is_active(email:str):
+    conn = get_db_connection()
+    if conn is None:
+        return {"status": "database error", "message": "Cannot reach Database"}
+
+    try:
+        cursor = conn.cursor()
+        sql = "select count(*) from student_account_activation where is_active =  true and email = %s;"
+        cursor.execute(sql, (email,))
+        count = cursor.fetchone()[0] 
+        cursor.close()
+        conn.close()
+
+        if count > 0:
+            return {"status": True, "message": "Account is active"} # account is activated
+        else:
+            return  {"status": False, "message": "Go to your email and activate your account"} #account is not activate
+    except Exception as e:
+        print("Database Query failed : " + e)
+        return {"status": "error", "message": "Failed to verify credentials"}
+
+
 
 def insert_student(email: str, fname: str, lname: str, plain_password: str) -> list:
     conn = get_db_connection()
@@ -67,7 +89,6 @@ def get_hashed_password_and_fullname(email:str):
     if conn is None:
         return {"status": "db_error", "message": "Database connection failed"}
     try:
-        print("Emil in db " + email)
         cursor = conn.cursor()
         sql="select fname, lname, password from students where email = %s"
         
@@ -135,14 +156,14 @@ def process_activation(email: str, token: str):
             if not student_info:
                 return {"status": "error", "message": "Student record not found"}
 
-            # Resend activation email with new token
+            # Verify token using bcrypt
+            if not verify_hash(token, record["token"]):
+                return {"status": "invalid", "message": "Invalid token"}
+
+            # Resend activation email with new token if token is expired
             send_activation_email(student_info["fname"], student_info["lname"], email, new_token)
 
             return {"status": "expired", "message": "Token expired. A new link has been sent."}
-
-        # Verify token using bcrypt
-        if not verify_hash(token, record["token"]):
-            return {"status": "invalid", "message": "Invalid token"}
 
         # Mark account as active
         cursor.execute("UPDATE student_account_activation SET is_active = TRUE WHERE email = %s", (email,))

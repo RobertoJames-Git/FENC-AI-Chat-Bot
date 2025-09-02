@@ -4,6 +4,41 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Attach submit event listener to the form using its ID
     form.addEventListener("submit", async (event) => {
+
+        const container = document.getElementById('form_container');
+        document.getElementById('right_column_content').style.display="none";
+
+        const loadingDiv = document.createElement('div');//create loading icon
+        const loadingMsg = document.createElement('p');
+
+        //style loading message and add text
+        loadingMsg.id="loadingMsg";
+        loadingMsg.textContent="Verifying credentials...";
+        loadingMsg.style.textAlign='center';
+        loadingMsg.style.marginTop="10px";
+
+        //style loading circle
+        loadingDiv.id="loading_icon";
+        
+        //set fixed height
+        container.style.height="334px";
+        
+        //add loading icon to container so its visible to user
+        container.appendChild(loadingDiv);
+        container.appendChild(loadingMsg);
+
+
+        function removeLoadingIcon(){
+            
+            container.removeChild(loadingDiv); //after you get response from backend remove loading icon
+            container.removeChild(loadingMsg); 
+            container.style.display="block";
+            container.style.height="auto";//allow container heigh to expand to display validation errors
+            document.getElementById('right_column_content').style.display="block";//display from content
+
+
+        }
+
         event.preventDefault(); // Prevent default form submission
 
         // Clear previous validation messages
@@ -29,6 +64,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const result = await response.json();
 
+
+            removeLoadingIcon();
+
             if (!response.ok) {
                 // If response is not OK, display errors from backend
                 if (result.email_error) {
@@ -50,6 +88,8 @@ document.addEventListener("DOMContentLoaded", () => {
             }
 
         } catch (error) {
+
+            removeLoadingIcon();
             console.error("Login request failed:", error);
             document.getElementById("email_error").innerHTML = "<br>"+ error.message;
             document.getElementById("password_error").innerHTML = "<br>"+ error.message;

@@ -29,35 +29,38 @@
 
         <div class="form_wrapper">
             <div id="form_container">
-                <div id="image_and_heading_in_form">
-                    <img src="images/chatbot.png" alt="" width="70px">
-                    <h2>FENC AI Chatbot</h2>
-                </div>
-                
-                <div id="login_div" onclick="location.href='signup.html'">Sign up</div>
 
-                <div class="line-text">
-                    <p>or</p>
-                </div>
-
-                <p id="form_prompt">Enter you login detail</p>
-
-                <p id="timeout_message"> <span id="time_left"></span> </p>
-
-                <form action="" method="post" id="verify_credentials">
-
-                    <label for="emailID">School Email</label>
-                    <span class="validation" id="email_error"></span>
-                    <input type="email" name="email" id="emailID" placeholder="e.g., john.doe@students.utech.edu.jm">
-
-                    <label for="passwordID">Password</label>
-                    <span class="validation" id="password_error"></span>
-                    <input type="password" name="password" id="passwordID" placeholder="at least 8 character with letter, number and symbol">
-
-                    <input type="reset" value="Clear">
-                    <input type="submit" value="Log in">
+                <div id="right_column_content">
+                    <div id="image_and_heading_in_form">
+                        <img src="images/chatbot.png" alt="" width="70px">
+                        <h2>FENC AI Chatbot</h2>
+                    </div>
                     
-                </form>
+                    <div id="login_div" onclick="location.href='signup.html'">Sign up</div>
+
+                    <div class="line-text">
+                        <p>or</p>
+                    </div>
+
+                    <p id="form_prompt">Enter you login detail</p>
+
+                    <p id="timeout_message"> <span id="time_left"></span> </p>
+
+                    <form action="" method="post" id="verify_credentials">
+
+                        <label for="emailID">School Email</label>
+                        <span class="validation" id="email_error"></span>
+                        <input type="email" name="email" id="emailID" placeholder="e.g., john.doe@students.utech.edu.jm">
+
+                        <label for="passwordID">Password</label>
+                        <span class="validation" id="password_error"></span>
+                        <input type="password" name="password" id="passwordID" placeholder="at least 8 character with letter, number and symbol">
+
+                        <input type="reset" value="Clear">
+                        <input type="submit" value="Log in">
+                        
+                    </form>
+                </div>
 
             </div>
         </div>

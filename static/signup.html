@@ -10,7 +10,6 @@
 <body>
 
 
-
     <div id="form_and_welcome_message_container">
         
         <div id="welcome_container">
@@ -32,44 +31,48 @@
 
             <div id="form_container">
 
-                <div id="image_and_heading_in_form">
-                    <img src="images/chatbot.png" alt="" width="70px">
-                    <h2>FENC AI Chatbot</h2>
-                </div>
-                
-                <div id="login_div" onclick="location.href='login.html'">Login</div>
-
-                <div class="line-text">
-                    <p>or</p>
-                </div>
-
-                <p id="form_prompt">Enter you details to create an account</p>
-
-                <form action="" method="post">
-
-                    <label for="fnameID">First Name</label>
-                    <span class="validation" id="fname_error"></span>
-                    <input type="text" name="fname" id="fnameID" placeholder="e.g., John">
+                <div id="right_column_content">           
+                    <div id="image_and_heading_in_form">
+                        <img src="images/chatbot.png" alt="" width="70px">
+                        <h2>FENC AI Chatbot</h2>
+                    </div>
                     
-                    <label for="lnmeID">Last Name</label>
-                    <span class="validation" id="lname_error"></span>
-                    <input type="text" name="lname" id="lnameID" placeholder="e.g, Doe">
+                    <div id="login_div" onclick="location.href='login.html'">Login</div>
 
-                    <label for="emailID">School Email</label>
-                    <span class="validation" id="email_error"></span>
-                    <input type="email" name="email" id="emailID" placeholder="e.g., john.doe@students.utech.edu.jm">
+                    <div class="line-text">
+                        <p>or</p>
+                    </div>
 
-                    <label for="passwordID">Password</label>
-                    <span class="validation" id="password_error"></span>
-                    <input type="password" name="password" id="passwordID" placeholder="at least 8 character with letter, number and symbol">
+                    <p id="form_prompt">Enter you details to create an account</p>
 
-                    <label for="confirm_password_ID">Confirm Password</label>
-                    <span class="validation" id="confirm_password_error"></span>
-                    <input type="password" name="confirm_password" id="confirm_password_ID" placeholder="Re-enter Password">
+                    <form action="" method="post">
 
-                    <input type="reset" value="Clear">
-                    <input type="submit" value="Sign Up">
-                </form>
+                        <label for="fnameID">First Name</label>
+                        <span class="validation" id="fname_error"></span>
+                        <input type="text" name="fname" id="fnameID" placeholder="e.g., John">
+                        
+                        <label for="lnmeID">Last Name</label>
+                        <span class="validation" id="lname_error"></span>
+                        <input type="text" name="lname" id="lnameID" placeholder="e.g, Doe">
+
+                        <label for="emailID">School Email</label>
+                        <span class="validation" id="email_error"></span>
+                        <input type="email" name="email" id="emailID" placeholder="e.g., john.doe@students.utech.edu.jm">
+
+                        <label for="passwordID">Password</label>
+                        <span class="validation" id="password_error"></span>
+                        <input type="password" name="password" id="passwordID" placeholder="at least 8 character with letter, number and symbol">
+
+                        <label for="confirm_password_ID">Confirm Password</label>
+                        <span class="validation" id="confirm_password_error"></span>
+                        <input type="password" name="confirm_password" id="confirm_password_ID" placeholder="Re-enter Password">
+
+                        <input type="reset" value="Clear">
+                        <input type="submit" value="Sign Up">
+                    </form>
+                </div>
+
+
             </div>
         </div>
 

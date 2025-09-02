@@ -5,8 +5,8 @@ from fastapi.staticfiles import StaticFiles
 from gemini import get_gemini_response
 from google.api_core.exceptions import ResourceExhausted
 from fastapi.middleware.cors import CORSMiddleware
-from utility.hash_utils import hash_text,verify_hash
-from database.database_actions import process_activation, insert_student, email_exist, get_hashed_password_and_fullname
+from utility.hash_utils import verify_hash
+from database.database_actions import process_activation, insert_student, email_exist, get_hashed_password_and_fullname, account_is_active
 from starlette.middleware.sessions import SessionMiddleware
 import re 
 from dotenv import load_dotenv
@@ -72,7 +72,7 @@ async def get_index(request: Request):
 @app.post("/ask")
 async def ask_question(request: Request):
     data = await request.json()
-    question = data.get("question")
+    question = data.get("question").strip()
     if not question:
         return {"error": "Missing question"}
     
@@ -199,11 +199,11 @@ async def signup(request: Request):
 @app.post("/activate_account")
 async def activate_account(request: Request):
     data = await request.json()
-    email = data.get("email")
-    token = data.get("token")
+    email = data.get("email").strip()
+    token = data.get("token").strip()
 
     if not email or not token:
-        raise HTTPException(status_code=400, detail="Missing email or token")
+        return JSONResponse(content={"message":"Missing email or token"},status_code=400)
 
     now = datetime.now()
 
@@ -214,7 +214,7 @@ async def activate_account(request: Request):
             lockout_time = datetime.fromisoformat(lockout_until)
             if now < lockout_time:
                 return JSONResponse(
-                    content={"error": "Too many attempts. Please wait 1 minute before trying again."},
+                    content={"message": "Too many attempts. Please wait 1 minute before trying again."},
                     status_code=429
                 )
         except ValueError:
@@ -233,7 +233,7 @@ async def activate_account(request: Request):
                     # Set lockout for 1 minute
                     request.session["activation_lockout_until"] = (now + timedelta(minutes=1)).isoformat()
                     return JSONResponse(
-                        content={"error": "Too many attempts. Please wait 1 minute before trying again."},
+                        content={"message": "Too many attempts. Please wait 1 minute before trying again."},
                         status_code=429
                     )
                 else:
@@ -251,19 +251,19 @@ async def activate_account(request: Request):
         request.session["activation_window_start"] = now.isoformat()
         request.session["activation_attempt_count"] = 1
 
-    # 🚀 Proceed with activation logic
+    # Proceed with activation logic
     result = process_activation(email, token)
 
     if result["status"] == "error":
-        raise HTTPException(status_code=500, detail=result["message"])
+        return JSONResponse(content={"message":result["message"]}, status_code=500)
     elif result["status"] == "not_found":
-        raise HTTPException(status_code=404, detail=result["message"])
-    elif result["status"] == "invalid":
-        raise HTTPException(status_code=401, detail=result["message"])
+        return JSONResponse(content={"message":result["message"]}, status_code=404)
+    elif result["status"] in ["invalid", "expired"]:
+        return JSONResponse(content={"message":result["message"]}, status_code=401)
 
-    return JSONResponse(content=result, status_code=200)
-
-
+    
+    return JSONResponse(content={"message":result["message"]}, status_code=200)
+ 
 
 @app.get("/activate", response_class=HTMLResponse)
 async def serve_activate_page():
@@ -274,6 +274,7 @@ async def serve_activate_page():
 
 @app.post("/verify_login")
 async def verify_login(request: Request):
+
     # Attempt to parse incoming JSON payload
     try:
         data = await request.json()
@@ -364,6 +365,21 @@ async def verify_login(request: Request):
     # Verify password against stored hash
     hashed_password = result["hash_pwd"]
     if verify_hash(password, hashed_password):
+
+        #check if acccount is active
+        result=account_is_active(email)
+
+        if result["status"] == False: #check if account was activated
+            errors["email_error"] = result["message"]
+            errors["password_error"] = result["message"]
+            return JSONResponse(content=errors, status_code=401)
+        
+        elif result["status"] == "error":#database error
+            errors["email_error"] = result["message"]
+            errors["password_error"] = result["message"]
+            return JSONResponse(content=errors, status_code=500)
+
+
         # Successful login — clear session tracking and store user info
         request.session.pop("student_login_attempt", None)
         request.session.pop("student_login_lockout_start", None)
