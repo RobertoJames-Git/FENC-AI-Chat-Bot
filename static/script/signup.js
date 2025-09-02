@@ -24,6 +24,19 @@ document.querySelector("form").addEventListener("submit", async function (e) {
     container.appendChild(loadingDiv);
     container.appendChild(loadingMsg);
 
+
+    function removeLoadingIcon(){
+
+    container.removeChild(loadingDiv); //after you get response from backend remove loading icon
+    container.removeChild(loadingMsg); 
+    container.style.display="block";
+    container.style.height="auto";//allow container heigh to expand to display validation errors
+    document.getElementById('right_column_content').style.display="block";//display from content
+
+
+    }
+
+
     e.preventDefault(); // Prevent default form submission (page reload)
 
     // ==============================
@@ -61,11 +74,7 @@ document.querySelector("form").addEventListener("submit", async function (e) {
         // Step 4: Handle Error Response (HTTP Status 400)
         // ==============================
         
-        container.removeChild(loadingDiv); //after you get response from backend remove loading icon
-        container.removeChild(loadingMsg); 
-        container.style.display="block";
-        container.style.height="auto";//allow container heigh to expand to display validation errors
-        document.getElementById('right_column_content').style.display="block";//display from content
+        removeLoadingIcon();
 
         if (!res.ok) { // If response is NOT successful
             const errors = await res.json(); // Convert JSON errors to JS object
@@ -97,6 +106,7 @@ document.querySelector("form").addEventListener("submit", async function (e) {
         // ==============================
         // Step 6: Handle Network/Server Errors
         // ==============================
+        removeLoadingIcon();
         console.error("Error:", err);
         alert("Something went wrong. Please try again.");
     }
