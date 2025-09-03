@@ -178,7 +178,6 @@ outline: 2px solid white;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
-  padding-right: 10px;
   min-height: 0;
   height: 100%;
   justify-content:flex-end;
@@ -403,10 +402,11 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 }
 
 
+.side_panel,#new_chat_container, #sidebar_heading{
 
-
-.side_panel,#new_chat_container{
-    white-space: nowrap;       /* Prevents line breaks */
-  overflow: hidden;          /* Hides overflowed content */
-  text-overflow: ellipsis;   /* Adds "..." if text is cut off */
+  white-space: nowrap;  /* prevents wrapping */
+  overflow: hidden;     /* hides anything that doesn't fit */
 }
+
+
+

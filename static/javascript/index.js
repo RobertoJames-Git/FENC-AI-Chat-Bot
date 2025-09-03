@@ -253,8 +253,6 @@ function controlSidebar() {
 
   //reduce width of sidebar 
   sidebar.style.width="40px";
-  name_container.style.padding="4px";
-  document.getElementById('student_fullname').style.display='none';
   sidebarIcon.src="static/images/sidebar_open.svg";
   sidebarIcon.title="Open Sidebar";
   document.getElementById('new_chat_container').style.textAlign ='center';
@@ -268,3 +266,45 @@ function controlSidebar() {
 
 
 
+
+function applyResponsiveStyles() {
+  const isNarrowScreen = window.innerWidth <= 960;
+
+  const userItems = document.getElementById('user_interaction_items');
+  const aiContainer = document.getElementById('ai_and_user_container');
+  const userContainer = document.getElementById('user_interaction_container');
+  const currentConvoContainer = document.getElementById('current_convo_container');
+
+  //check if windows size is equal to or smaller than 960px
+
+  if (isNarrowScreen) {
+    userItems.style.width = 'auto';
+
+    // Get actual pixel width of userItems
+    const actualWidth = userItems.offsetWidth;
+
+    // Apply adjusted width to aiContainer
+    aiContainer.style.width = (actualWidth - 20) + 'px';
+
+    // Apply padding
+    userContainer.style.padding = '0px 20px';
+
+    // Log actual width of aiContainer
+    console.log("width:", aiContainer.offsetWidth + "px");
+  }
+  else {
+    // Reset styles for wider screens
+    userItems.style.width = '';
+    aiContainer.style.width = '';
+
+    userContainer.style.padding = '';
+    aiContainer.style.padding = '';
+    currentConvoContainer.style.padding = '0px';
+  }
+  
+}
+
+applyResponsiveStyles();
+
+// Reapply styles on window resize
+window.addEventListener('resize', applyResponsiveStyles);
