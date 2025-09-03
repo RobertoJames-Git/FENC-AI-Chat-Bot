@@ -130,7 +130,9 @@ async function sendQuestion() {
     console.log(data);
     
     if(data.response){
-    formattedResponse = formatMarkdown(data.response);
+      //The AI may return data with astericks and other symbo and this function
+      // removes those symbols and use them as indicator to know when to style the text or create a list
+      formattedResponse = formatMarkdown(data.response);
     }
     else{
         insertUserMessage("ai_response_error",data.error);
