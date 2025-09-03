@@ -1,11 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FENC FAQ Chatbot</title>
-  <link rel="stylesheet" href="static/style/index_style.css">
-  <script src="static/javascript/script.js" defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FENC FAQ Chatbot</title>
+
+    <link rel="stylesheet" href="static/style/index_style.css">
+    <script src="static/javascript/index.js" defer></script>
+
+
 </head>
 <body>
 
@@ -13,10 +16,11 @@
   <div id="main_container">
         <div id="sidebar" class="unselectable">
             <div id="menu_options">
-                <p id="sidebar_heading" class="center">FENC Chatbot</p>
+                <p id="sidebar_heading" class="center"><span class="sidebar_text"> FENC Chatbot </span> <img src="static/images/sidebar_close.svg" alt="" width="24px" id="sidebar_icon" title="Close Sidebar" onclick="controlSidebar()"> </p>
 
-                    <div id="new_chat_container" > 
-                        <img src="static/images/icons8-edit-pencil.svg" alt="" width="20px"> New Chat
+
+                    <div id="new_chat_container" title="New Chat" > 
+                        <img src="static/images/icons8-edit-pencil.svg" alt="" width="20px"> <span class="sidebar_text">New Chat</span>
                     </div>
 
                 <div id="conversation_history_container" >
@@ -42,9 +46,9 @@
                     </div>
                 </div>
 
-                <div id="name_container" class="menu_items">
-                    <img src="static/images/icons8-profile-32.png" alt="">
-                    <span>{{fname}}<br>{{lname}}</span>
+                <div id="name_container" class="menu_items" title="{{fname}} {{lname}}">
+                    <img src="static/images/icons8-profile-32.png" alt="" width="30px">
+                    <span id="student_fullname" >{{fname}}<br>{{lname}}</span>
                 </div>
             </div>
 

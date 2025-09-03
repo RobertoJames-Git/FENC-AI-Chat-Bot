@@ -367,16 +367,16 @@ async def verify_login(request: Request):
     if verify_hash(password, hashed_password):
 
         #check if acccount is active
-        result=account_is_active(email)
+        db_result=account_is_active(email)
 
-        if result["status"] == False: #check if account was activated
-            errors["email_error"] = result["message"]
-            errors["password_error"] = result["message"]
+        if db_result["status"] == False: #check if account was activated
+            errors["email_error"] = db_result["message"]
+            errors["password_error"] = db_result["message"]
             return JSONResponse(content=errors, status_code=401)
         
-        elif result["status"] == "error":#database error
-            errors["email_error"] = result["message"]
-            errors["password_error"] = result["message"]
+        elif db_result["status"] == "error":#database error
+            errors["email_error"] = db_result["message"]
+            errors["password_error"] = db_result["message"]
             return JSONResponse(content=errors, status_code=500)
 
 

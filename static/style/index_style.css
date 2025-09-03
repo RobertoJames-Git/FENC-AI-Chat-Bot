@@ -30,6 +30,7 @@ body{
     width: 220px;
     padding: 10px;
     grid-row: span 2; /* Sidebar spans both rows */
+    transition: width 0.2s ease;
 }
 
 
@@ -38,6 +39,21 @@ body{
     font-weight: bold;
     cursor: pointer;
     margin-top: 30px;
+    display: flex;
+    align-items: center;
+    column-gap: 70px;
+
+}
+
+#sidebar_icon {
+  transition: all 0.3s ease;
+  padding: 5px;
+  border-radius: 5px;
+
+}
+
+#sidebar_icon:hover {
+  background-color: #424242;
 }
 
 .center{
@@ -47,15 +63,13 @@ body{
 
 #new_chat_container{
 
-    background-color: #1946da;
+    background-color: #424242;
     border-radius: 10px;
     cursor: pointer;
     width: 100%;
     padding: 5px;
     margin: auto;
-    border-left: 0px solid #1946da;
     box-sizing: border-box;  
-    transition: 0.5s ease border-left;
 }
 
 #new_chat_container:hover{
@@ -75,9 +89,10 @@ body{
     border-radius: 5px;
     cursor: pointer;
     transition:  0.3s ease-in-out border-left;
+    opacity:1 ;
 }
 
-.side_panel:hover,#new_chat_container:hover{
+.side_panel:hover{
     border-left:20px solid #1946da;
 }
 
@@ -99,8 +114,8 @@ body{
     
     /* Font and text */
     font-family: sans-serif; /* Use a consistent font */
-    font-size: 16px; /* 16px by default on most browsers */
-    line-height: 16px; /* Increased for better readability and calculation stability */
+    font-size: 14px; /* 14px by default on most browsers */
+    line-height: 18px; 
 
     /* Behavior */
     resize: none; /* Prevent manual resizing by the user */
@@ -110,7 +125,7 @@ body{
      * Set max-height for 7 lines.
      * Calculation: (line-height * 7 lines) + vertical padding
      */
-    max-height: calc(16px* 7 + 20px);
+    max-height: calc(18px* 7 + 20px);
 
     /* Appearance */
     border: none;
@@ -312,25 +327,26 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
     to { transform: rotate(360deg); }
 }
 
+#logout_container{
+  transition: 0.5s ease border-left;
+  border-left: 5px solid #1946da;
+    padding: 8px;
+}
+
+#logout_container:hover{
+  border-left: 20px solid #1946da;
+}
+
 
 .menu_items{
   display: flex;
   align-items: center;
   background-color: #424242;
-  padding: 8px;
+
   border-radius: 5px;
-  border-left: 5px solid #1946da;
   cursor: pointer;
-  transition: 0.5s ease border-left;
 }
 
-.menu_items:hover{
-  border-left: 20px solid #1946da;
-}
-
-#logout_container{
-
-}
 
 
 #name_container {
@@ -340,6 +356,12 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   overflow: hidden;
   text-overflow: ellipsis;
   gap: 8px;
+  padding: 5px;
+  transition: padding 0.2s ease;
+  
+}
+#name_container:hover{
+  outline: 1px solid white;
 }
 
 
@@ -378,4 +400,13 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+}
+
+
+
+
+.side_panel,#new_chat_container{
+    white-space: nowrap;       /* Prevents line breaks */
+  overflow: hidden;          /* Hides overflowed content */
+  text-overflow: ellipsis;   /* Adds "..." if text is cut off */
 }

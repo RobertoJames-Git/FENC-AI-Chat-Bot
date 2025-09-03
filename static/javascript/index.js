@@ -220,3 +220,51 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+function controlSidebarText(action){
+    const sidebar_text = document.querySelectorAll('.sidebar_text');
+
+      // Loop through and hide each one
+    sidebar_text.forEach(eachElement => {
+      eachElement.style.display = action;
+    });
+}
+
+
+function controlSidebar() {
+  let sidebar = document.getElementById("sidebar");
+  let sidebarIcon = document.getElementById('sidebar_icon');
+  let name_container = document.getElementById('name_container');
+
+  //expand the sidepanel
+  if(sidebar.style.width=="40px"){
+    sidebar.style.width="220px";
+    controlSidebarText("inline");//display sidebar text
+    document.getElementById("conversation_history_container").style.display='block';//show chat history
+    name_container.style.padding="5px";
+    document.getElementById('student_fullname').style.display='inline';
+    document.getElementById('new_chat_container').style.textAlign ="";
+
+    sidebarIcon.src="static/images/sidebar_close.svg"; //change image to represent if the sidebar eill expand or collapse
+    sidebarIcon.title="Close Sidebar";//user sees appropriate title when they hovr
+
+    return;//no more changes will take effect
+  }
+
+
+  //reduce width of sidebar 
+  sidebar.style.width="40px";
+  name_container.style.padding="4px";
+  document.getElementById('student_fullname').style.display='none';
+  sidebarIcon.src="static/images/sidebar_open.svg";
+  sidebarIcon.title="Open Sidebar";
+  document.getElementById('new_chat_container').style.textAlign ='center';
+
+  controlSidebarText("none");//hide sidebar text
+  document.getElementById("conversation_history_container").style.display='none';
+
+
+}
+
+
+
+
