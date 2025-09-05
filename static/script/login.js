@@ -65,9 +65,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const result = await response.json();
 
 
-            removeLoadingIcon();
-
             if (!response.ok) {
+                removeLoadingIcon();
                 // If response is not OK, display errors from backend
                 if (result.email_error) {
                     document.getElementById("email_error").innerHTML = "<br>" + result.email_error;

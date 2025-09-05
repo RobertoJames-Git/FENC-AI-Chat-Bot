@@ -7,13 +7,12 @@
 
     <link rel="stylesheet" href="static/style/index_style.css">
     <script src="static/javascript/index.js" defer></script>
-
-
 </head>
 <body>
 
-
-  <div id="main_container">
+    <div id="sidebar-overlay"></div>
+    
+    <div id="main_container">
         <div id="sidebar" class="unselectable">
             <div id="menu_options">
                 <p id="sidebar_heading" class="center"><span class="sidebar_text"> FENC Chatbot </span> <img src="static/images/sidebar_close.svg" alt="" width="24px" id="sidebar_icon" title="Close Sidebar" onclick="controlSidebar()"> </p>
@@ -53,31 +52,41 @@
             </div>
 
         </div>
-      
-      
-      <div id="current_convo_container">
-          <p id="welcome_message">What can I help with ?</p>
-          <div id="ai_and_user_container">
+        
+        <div id="portrait_sidebar_control">
+            <img src="static/images/sidebar_open.svg" alt="" width="24px" id="sidebar_icon_portrait" title="Open Sidebar" onclick="controlPortraitSidebar()">
+            
+            <div id="portrait_top_heading">
+                <img src="../static/images/chatbot.png" alt="" width="24px">
+                <span>FENC Chatbot</span>
+            </div>
 
-          </div>
-      </div>
+        </div>
 
-      <div id="user_interaction_container">
-          <div id="user_interaction_items">
-              
-              <div id="textarea_container">
-                  <textarea id="userInput" placeholder="Type your question here..."  rows="1"></textarea>
-              </div>
+        
+        <div id="current_convo_container">
+            <p id="welcome_message">What can I help with ?</p>
+            <div id="ai_and_user_container">
 
-              <div id="options_container" class="unselectable" >
-                  <img src="static/images/up_arrow.svg" alt="" width="18px" onclick="sendQuestion()">
-              </div>
+            </div>
+        </div>
 
-          </div>
-      </div>
+        <div id="user_interaction_container">
+            <div id="user_interaction_items">
+                
+                <div id="textarea_container">
+                    <textarea id="userInput" placeholder="Type your question here..."  rows="1"></textarea>
+                </div>
+
+                <div id="options_container" class="unselectable" >
+                    <img src="static/images/up_arrow.svg" alt="" width="18px" onclick="sendQuestion()">
+                </div>
+
+            </div>
+        </div>
 
 
-  </div>
+    </div>
 
 
 
