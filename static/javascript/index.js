@@ -144,7 +144,9 @@ async function sendQuestion() {
       formattedResponse = formatMarkdown(data.response);
     }
     else{
-        insertUserMessage("ai_response_error",data.error);
+        displayServerError(data.error);
+        loadingIcon.remove()
+        return;
     }
 
     //remove loading icon
@@ -152,6 +154,34 @@ async function sendQuestion() {
     insertUserMessage("ai_response",formattedResponse.trim());
 
     
+}
+
+function displayServerError(errorMsg) {
+  const errorMsgContainer = document.getElementById('errorMsg');
+  const errorMsgContent = document.getElementById('errorMsgContent');
+
+  // Set error message
+  errorMsgContent.textContent = errorMsg;
+
+  // Reset styles
+  errorMsgContainer.style.transition = 'none'; // Disable transition temporarily
+  errorMsgContainer.style.top = '-100px';
+  errorMsgContainer.style.display = 'block';
+
+  // Force reflow to apply initial position
+  void errorMsgContainer.offsetHeight;
+
+  // Enable transition and animate in
+  errorMsgContainer.style.transition = 'top 0.5s ease';
+  errorMsgContainer.style.top = '100px';
+
+  // Animate out after 5 seconds
+  setTimeout(() => {
+    errorMsgContainer.style.top = '-100px';
+    setTimeout(() => {
+      errorMsgContainer.style.display = 'none';
+    }, 500); // Wait for transition to finish
+  }, 5000);
 }
 
 
@@ -357,12 +387,12 @@ function applyResponsiveStyles() {
 		narrowLandscapeScreen();
 		portrait_sidebar_control.style.display='flex';
 
-		if(ai_and_user_container_populated){
+		if(ai_and_user_container_populated){ // if container with current convo history is populated
 			
 			main_container.style.gridTemplateRows="50px 1fr auto";
 
 		}
-		else{ //if the continer with current convo historyy is blank
+		else{ //if the container with current convo history is blank
 
 			main_container.style.gridTemplateRows="50px auto 60%";
 
@@ -407,28 +437,40 @@ window.addEventListener('resize', applyResponsiveStyles);
 
 
 
-
 function controlPortraitSidebar() {
-	const sidebar = document.getElementById('sidebar');
-	const overlay = document.getElementById('sidebar-overlay');
-	expandSidebar();
-	// Show sidebar
-	sidebar.style.position = 'fixed';
-	sidebar.style.top = '0';
-	sidebar.style.left = '0';
-	sidebar.style.zIndex = '3';
-	sidebar.style.height = '98vh';
-	sidebar.style.display = 'flex';
 
-	// Show overlay
-	overlay.style.display = 'block';
-	portraitOpenSidebar=true;
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
 
-	// Add click listener to close sidebar
-	overlay.onclick = () => {
-	closePortraitSidebar();
-	};
+  expandSidebar();
+
+  // Initial sidebar styles
+  sidebar.style.position = 'fixed';
+  sidebar.style.top = '0';
+  sidebar.style.left = '0';
+  sidebar.style.zIndex = '3';
+  sidebar.style.height = '98vh';
+  sidebar.style.width = '0px';
+  sidebar.style.display = 'flex';
+
+  // Apply transition via CSS (if not already in stylesheet)
+  sidebar.style.transition = 'width 0.2s ease';
+  sidebar.style.overflow = 'hidden';
+
+  // Trigger width change after a short delay
+  setTimeout(() => {
+      sidebar.style.width = '220px';
+  }, 10); // 10ms is enough to allow the browser to register the initial width
+
+  // Show overlay
+  overlay.style.display = 'block';
+  portraitOpenSidebar = true;
+
+  overlay.onclick = () => {
+      closePortraitSidebar();
+  };
 }
+
 
 function closePortraitSidebar(){
 

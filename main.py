@@ -31,10 +31,13 @@ app.add_middleware(
     allow_headers=["*"],   # Allow all HTTP headers
 )
 
+# 30 days in seconds
+SESSION_MAX_AGE = 30 * 24* 60 * 60  # 30 days
+
 app.add_middleware(
     SessionMiddleware,
     secret_key=SECRET_KEY,  # Keep this secure
-    max_age=3600  # session expires in 1 hour
+    max_age=SESSION_MAX_AGE  # session expires in 30 days
 )
 
 # Handle chat questions
@@ -71,6 +74,13 @@ async def get_index(request: Request):
 
 @app.post("/ask")
 async def ask_question(request: Request):
+
+    # Make sure user is logged in
+    if "student_email" not in request.session:
+        return  {"error":"You are not logged in"}
+
+
+
     data = await request.json()
     question = data.get("question").strip()
     if not question:
@@ -88,7 +98,24 @@ async def ask_question(request: Request):
     
     #Debug
     print("User: ",question)
-    print("AI: ",response,"\n")
+    print("AI: ",response)
+
+    # ------------------------
+    # Refresh session cookie manually
+    # ------------------------
+    session_cookie = request.cookies.get("session")
+    if session_cookie:
+        # Send cookie back with updated expiry
+        response_obj = JSONResponse(content={"response": response})
+        response_obj.set_cookie(
+            key="session",
+            value=session_cookie,
+            httponly=True,
+            max_age=SESSION_MAX_AGE,   # reset countdown to 30 days
+            samesite="lax",
+            secure=False               # set True in production (HTTPS)
+        )
+        return response_obj #return updated cookie
 
     return {"response": response}
 

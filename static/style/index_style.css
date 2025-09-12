@@ -380,7 +380,7 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   padding: 10px;
   display: none; /* hidden by default */
   box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-  z-index: 10;
+  z-index: 5;
   width: 200px;
   outline: 2px solid rgb(150,150,150);
 }
@@ -446,4 +446,26 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   z-index: 2; /* Just below the sidebar */
   display: none; /* Hidden by default */
 
+}
+
+
+#errorMsg {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+  max-width: 300px;
+  outline: 2px solid red;
+  display: none;
+
+}
+
+#errorMsg h2{
+  color: red;
+  margin-bottom: 10px;
 }
