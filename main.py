@@ -6,7 +6,7 @@ from gemini import get_gemini_response
 from google.api_core.exceptions import ResourceExhausted
 from fastapi.middleware.cors import CORSMiddleware
 from utility.hash_utils import verify_hash
-from database.database_actions import process_activation, insert_student, email_exist, get_hashed_password_and_fullname, account_is_active
+from database import database_actions
 from starlette.middleware.sessions import SessionMiddleware
 import re 
 from dotenv import load_dotenv
@@ -75,14 +75,18 @@ async def get_index(request: Request):
 @app.post("/ask")
 async def ask_question(request: Request):
 
+    email= request.session.get("student_email")
     # Make sure user is logged in
-    if "student_email" not in request.session:
+    if not email:
         return  {"error":"You are not logged in"}
 
 
-
     data = await request.json()
-    question = data.get("question").strip()
+    print (data)
+    
+    question = (data.get("question") or "").strip()
+    token_UUID = (data.get("token_uuid") or "").strip()
+    #get conversatoken token UUID from frontend
     if not question:
         return {"error": "Missing question"}
     
@@ -100,13 +104,31 @@ async def ask_question(request: Request):
     print("User: ",question)
     print("AI: ",response)
 
+    
+    dbResult=None
+    if token_UUID == "": #check if token is empty
+        dbResult = database_actions.store_new_conversation(email,question,response)
+
+    else:#if a token is returned then add the ai and user convo to the existing chat history
+        dbResult=database_actions.add_to_chat_history(email,token_UUID,question,response)
+
+    if dbResult["status"] != "success":
+        return {"error": dbResult["message"]}
+
+
     # ------------------------
     # Refresh session cookie manually
     # ------------------------
     session_cookie = request.cookies.get("session")
+    payload = {"response": response}
+
+    if "token_uuid" in dbResult:
+        payload["token_uuid"] = dbResult["token_uuid"]
+    else:
+        payload["token_uuid"] = token_UUID
+
     if session_cookie:
-        # Send cookie back with updated expiry
-        response_obj = JSONResponse(content={"response": response})
+        response_obj = JSONResponse(content=payload)
         response_obj.set_cookie(
             key="session",
             value=session_cookie,
@@ -115,9 +137,10 @@ async def ask_question(request: Request):
             samesite="lax",
             secure=False               # set True in production (HTTPS)
         )
-        return response_obj #return updated cookie
+        return response_obj
 
-    return {"response": response}
+    return payload
+
 
 
 
@@ -166,7 +189,7 @@ async def signup(request: Request):
         # Pattern ensures the email ends with @students.utech.edu.jm
         errors["email_error"] = "Must be a valid UTECH student email"
     else:
-        email_result = email_exist(email)  # Only check existence if format is valid
+        email_result = database_actions.email_exist(email)  # Only check existence if format is valid
         if email_result["status"] == "exists" or email_result["status"] == "error":
             errors["email_error"] = email_result["message"]
 
@@ -206,7 +229,7 @@ async def signup(request: Request):
     if errors:
         return JSONResponse(content=errors, status_code=400)
     
-    result = insert_student(email, fname, lname, password)
+    result = database_actions.insert_student(email, fname, lname, password)
 
     #check if an error occurred from adding the user to the database and send it to the frontend
     if not result[0]:
@@ -279,7 +302,7 @@ async def activate_account(request: Request):
         request.session["activation_attempt_count"] = 1
 
     # Proceed with activation logic
-    result = process_activation(email, token)
+    result = database_actions.process_activation(email, token)
 
     if result["status"] == "error":
         return JSONResponse(content={"message":result["message"]}, status_code=500)
@@ -364,7 +387,7 @@ async def verify_login(request: Request):
 
     # Attempt to retrieve credentials from database
     credentials_error = "Email and / or password is incorrect"
-    result = get_hashed_password_and_fullname(email)
+    result = database_actions.get_hashed_password_and_fullname(email)
 
 
     # Handle invalid credentials
@@ -394,7 +417,7 @@ async def verify_login(request: Request):
     if verify_hash(password, hashed_password):
 
         #check if acccount is active
-        db_result=account_is_active(email)
+        db_result=database_actions.account_is_active(email)
 
         if db_result["status"] == False: #check if account was activated
             errors["email_error"] = db_result["message"]

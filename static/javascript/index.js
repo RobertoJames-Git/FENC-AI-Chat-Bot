@@ -1,3 +1,4 @@
+
 document.addEventListener('DOMContentLoaded', () => {
     const textarea = document.getElementById('userInput');
 
@@ -92,6 +93,9 @@ function formatMarkdown(text) {
 
 let ai_and_user_container_populated =false;
 let isOrientedPortrait =false;
+let conversationTokenUUID = "";
+
+
 async function sendQuestion() {
     const userInput = document.getElementById("userInput").value.trim();//retrieve what the user entered in the input
     
@@ -133,15 +137,22 @@ async function sendQuestion() {
     headers: {
         "Content-Type": "application/json"
     },
-    body: JSON.stringify({ question: userInput })
+    body: JSON.stringify({ question: userInput, token_uuid : conversationTokenUUID})
     });
     const data = await res.json();
     console.log(data);
     
     if(data.response){
+
+      
+      conversationTokenUUID = data.token_uuid;
+      const newUrl = `/chat/${conversationTokenUUID}`;
+      window.history.pushState({}, '', newUrl);//update url without a page reload
+
       //The AI may return data with astericks and other symbo and this function
       // removes those symbols and use them as indicator to know when to style the text or create a list
       formattedResponse = formatMarkdown(data.response);
+
     }
     else{
         displayServerError(data.error);

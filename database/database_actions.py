@@ -5,14 +5,16 @@ from utility.send_mail import send_activation_email
 import uuid
 import datetime
 
+database_conn_error_msg = "Unable to connect to database"
+
 def email_exist(email: str):
     conn = get_db_connection()
     if conn is None:
-        return {"status": "database error", "message": "Unable to check if email is already registered"}
+        return {"status": "database error", "message": database_conn_error_msg}
 
     try:
         cursor = conn.cursor()
-        sql = "SELECT COUNT(*) FROM students WHERE email = %s"
+        sql = "SELECT COUNT(*) FROM student WHERE email = %s"
         cursor.execute(sql, (email,))
         count = cursor.fetchone()[0]
         cursor.close()
@@ -28,7 +30,7 @@ def email_exist(email: str):
 def account_is_active(email:str):
     conn = get_db_connection()
     if conn is None:
-        return {"status": "database error", "message": "Cannot reach Database"}
+        return {"status": "database error", "message": database_conn_error_msg}
 
     try:
         cursor = conn.cursor()
@@ -51,7 +53,7 @@ def account_is_active(email:str):
 def insert_student(email: str, fname: str, lname: str, plain_password: str) -> list:
     conn = get_db_connection()
     if conn is None:
-        return [False, "Database connection failed"]
+        return [False, database_conn_error_msg]
 
     try:
         cursor = conn.cursor()
@@ -87,10 +89,10 @@ def get_hashed_password_and_fullname(email:str):
     conn = get_db_connection()
 
     if conn is None:
-        return {"status": "db_error", "message": "Database connection failed"}
+        return {"status": "db_error", "message": database_conn_error_msg}
     try:
         cursor = conn.cursor()
-        sql="select fname, lname, password from students where email = %s"
+        sql="select fname, lname, password from student where email = %s"
         
         cursor.execute(sql,(email,))
         record = cursor.fetchone()
@@ -118,7 +120,7 @@ def process_activation(email: str, token: str):
     # Establish database connection
     conn = get_db_connection()
     if conn is None:
-        return {"status": "error", "message": "Database connection failed"}
+        return {"status": "error", "message":database_conn_error_msg}
 
     try:
         cursor = conn.cursor(dictionary=True)
@@ -150,7 +152,7 @@ def process_activation(email: str, token: str):
             conn.commit()
 
             #get fname and lname
-            cursor.execute("select fname,lname from students where email = %s",(email,))
+            cursor.execute("select fname,lname from student where email = %s",(email,))
             student_info = cursor.fetchone()
 
             if not student_info:
@@ -181,8 +183,107 @@ def process_activation(email: str, token: str):
         conn.close()
 
 
+def store_new_conversation(email, user_message, ai_message):
+    """
+    Create a new conversation for a user and insert both the first user
+    message and the AI response into chat_history.
+    Returns conversation_id and token_uuid.
+    """
+    conn = get_db_connection()
+    if conn is None:
+        return {"status": "db_error", "message": database_conn_error_msg}
+
+    try:
+        import uuid
+        token_uuid = str(uuid.uuid4())
+        cursor = conn.cursor()
+
+        # 1) Insert into conversation table
+        sql = "INSERT INTO conversation (token_UUID, email) VALUES (%s, %s);"
+        cursor.execute(sql, (token_uuid, email))
+
+        # Get the auto-generated conversation_id
+        conversation_id = cursor.lastrowid
+
+        # 2) Insert user message
+        sql_user = """
+            INSERT INTO chat_history (conversation_id, role, message)
+            VALUES (%s, %s, %s);
+        """
+        cursor.execute(sql_user, (conversation_id, "user", user_message))
+
+        # 3) Insert AI response
+        sql_ai = """
+            INSERT INTO chat_history (conversation_id, role, message)
+            VALUES (%s, %s, %s);
+        """
+        cursor.execute(sql_ai, (conversation_id, "AI", ai_message))
+
+        conn.commit()
+
+        return {"status": "success","token_uuid": token_uuid}
+
+    except Exception as e:
+        print("Database Query failed:", str(e))
+        conn.rollback()
+        return {"status": "db_error", "message": "Failed to add conversation"}
+    finally:
+        cursor.close()
+        conn.close()
 
 
+
+
+    
+def add_to_chat_history(email,token_UUID,user_message,ai_message):
+
+    conn = get_db_connection()
+    if conn is None:
+        return {"status": "db_error", "message": "Unable to connect to Database Base"}
+
+    try:
+        cursor= conn.cursor()
+
+        #get corresponding conversation ID for tokenUUID
+        sql="select conversation_id from conversation where token_UUID = %s and email =  %s;"
+
+        cursor.execute(sql,(token_UUID,email))
+        record = cursor.fetchone() # get the record from the DB
+
+        if not record : # if no record was fetched
+            cursor.close()
+            conn.close()
+            return{"status":"invalid_uuid", "message":"Token UUID does not exist or does not belong to curent user"}
+        
+        conversation_id = record[0]
+        
+        # Insert user message
+        sql_user = """
+            INSERT INTO chat_history (conversation_id, role, message)
+            VALUES (%s, %s, %s);
+        """
+        cursor.execute(sql_user, (conversation_id, "user", user_message))
+
+        # Insert AI response
+        sql_ai = """
+            INSERT INTO chat_history (conversation_id, role, message)
+            VALUES (%s, %s, %s);
+        """
+        cursor.execute(sql_ai, (conversation_id, "AI", ai_message))
+
+        conn.commit()
+
+        return {"status": "success","message":"chat added to database"}
+
+    except Exception as e:
+        print("Database Query failed:", str(e))
+        conn.rollback()
+        return {"status": "db_error", "message": "Failed to add conversation"}
+    finally:
+        cursor.close()
+        conn.close()
+
+    
 
 
 
