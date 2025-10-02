@@ -7,19 +7,6 @@ This project is part of a major initiative for **Orientation Day 2025** to help 
 
 ---
 
-## 📑 Table of Contents  
-
-1. [Overview / Motivation](#overview--motivation)  
-2. [Features](#features)  
-3. [Tech Stack](#tech-stack)  
-4. [Project Structure](#project-structure)  
-5. [Installation & Setup](#installation--setup)  
-6. [Usage Instructions](#usage-instructions)  
-7. [Future Work](#future-work)  
-8. [Acknowledgments](#acknowledgments)  
-
----
-
 ## 📌 Overview   
 
 Navigating university policies can be overwhelming for students. This chatbot was developed to:  
