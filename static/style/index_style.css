@@ -82,7 +82,7 @@ body{
     align-items: center; /* vertically center image and text */
     gap: 8px; /* optional: space between image and text */
     padding: 6px 12px;
-    font-size: 16px;
+    font-size: 14px;
     background-color: #424242;
     border-left:5px solid #1946da;
     margin-bottom: 10px;
@@ -468,4 +468,15 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 #errorMsg h2{
   color: red;
   margin-bottom: 10px;
+}
+
+
+
+
+#no_convo{
+  outline: 2px solid #2554f3;
+  margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
 }

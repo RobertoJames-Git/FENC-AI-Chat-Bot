@@ -29,14 +29,18 @@
 
                 <div id="conversation_history_container" >
                     <p>Chats</p>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 1</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 2</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 3</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 4</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 5</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 6</div>
-                    <div class="side_panel"><img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">Chat 7</div>
-                                    
+                    {% if conversations %}
+                        {%for uuid, convo_date in conversations %}
+                            <div class="side_panel" token_UUID="{{ uuid }}">
+                                <img src="static/images/icons8-chat-room-96.svg" alt="" width="20px">
+                                {{ convo_date }}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                            <div id="no_convo" >{{message}}</div>
+                    {% endif %}
+
+
                 </div>
             </div>
 

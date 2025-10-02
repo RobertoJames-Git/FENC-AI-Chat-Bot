@@ -58,17 +58,43 @@ async def get_index(request: Request):
 
     #if any of them are empty then the user is redirected to the login page
     if email is None or fullname is None:
-        return RedirectResponse(url="/static/login.html")
+        return RedirectResponse(url="/static/login.html", status_code=302)
 
-    result=fullname.split()
-    fname=result[0]
-    lname=result[1]
+    
+    nameSplit=fullname.split()
+    fname=nameSplit[0]
+    lname=nameSplit[1]
+    
+    #get token_UUID for past conversations
+    result=database_actions.get_conversation_token_UUID(email)
+
+    if "token_UUIDs" in result and "started_at" in result:
+        token_UUID_List = result["token_UUIDs"]
+        date_of_convo = result["started_at"]
+
+        # inside your get_index route after fetching from DB:
+        formatted_dates = [dt.strftime("%b %d • %I:%M %p") for dt in date_of_convo]  # Windows safe
+        conversations = list(zip(token_UUID_List, formatted_dates))
+        # %b → abbreviated month (Jan, Feb, Aug)
+        # %-d → day without leading zero (3 instead of 03)
+        # %Y → full year
+
+        return templates.TemplateResponse("index.html", {
+            "request": request,
+            "email": email,
+            "fname": fname,
+            "lname": lname,
+            "conversations": conversations
+        })
+    
     return templates.TemplateResponse("index.html", {
         "request": request,
         "email": email,
         "fname": fname,
-        "lname": lname
+        "lname": lname,
+        "message":result["message"]
     })
+
 
 
 

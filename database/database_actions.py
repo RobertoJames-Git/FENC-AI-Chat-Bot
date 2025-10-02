@@ -285,6 +285,32 @@ def add_to_chat_history(email,token_UUID,user_message,ai_message):
 
     
 
+def get_conversation_token_UUID(email):
+    conn = get_db_connection()
 
+    if conn is None:
+        return {"status": "db_error", "message": database_conn_error_msg}
+    
+    try:
+        cursor = conn.cursor()
+        sql = "SELECT token_UUID, started_at FROM conversation WHERE email = %s order by started_at DESC;"
+        cursor.execute(sql, (email,))
+        rows = cursor.fetchall() #get all records
+
+        if not rows:
+            return {"status": "no_conversation", "message": "No chat history yet"}
+        
+        # Flatten tuple results into a list of strings
+        token_UUIDs = [row[0] for row in rows]
+        started_at = [row[1] for row in rows]
+
+        return {"status": "success", "token_UUIDs": token_UUIDs,"started_at":started_at}
+
+    except Exception as e:
+        print("Database query Failed", str(e))
+        return {"status": "db_error", "message": "Failed to retrieve conversation history"}
+    finally:
+        cursor.close()
+        conn.close()
 
 
