@@ -40,17 +40,16 @@ app.add_middleware(
     max_age=SESSION_MAX_AGE  # session expires in 30 days
 )
 
-# Handle chat questions
-chat_history = []
-
 templates = Jinja2Templates(directory="templates")
 
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # Serve index.html at root
+@app.get("/chat/{current_convo_UUID}", response_class=HTMLResponse)
 @app.get("/", response_class=HTMLResponse)
-async def get_index(request: Request):
+async def get_index(request: Request, current_convo_UUID: str | None = None):
+
 
     #retrieve user email and fullname from session
     email = request.session.get("student_email")
@@ -68,7 +67,8 @@ async def get_index(request: Request):
     #get token_UUID for past conversations
     result=database_actions.get_conversation_token_UUID(email)
 
-    if "token_UUIDs" in result and "started_at" in result:
+
+    if "token_UUIDs" in result and "started_at" in result: # retrieve past conversation from users
         token_UUID_List = result["token_UUIDs"]
         date_of_convo = result["started_at"]
 
@@ -87,14 +87,36 @@ async def get_index(request: Request):
             "conversations": conversations
         })
     
+    #if user does not have past conversation history of database error occurred
     return templates.TemplateResponse("index.html", {
         "request": request,
         "email": email,
         "fname": fname,
         "lname": lname,
-        "message":result["message"]
+        "message":result["message"] #errors like database errors or prompt user to start  aconversation
     })
 
+
+
+#if user loads page with a UUID in the url ../chat/current_convo_UUID then the frontend will call this end point
+# to get their convo from the database corresponding with the UUID
+@app.get("/current_convo/{current_convo_UUID}")
+async def get_current_conversation_history(request:Request,current_convo_UUID:str):
+
+    #retrieve user email and fullname from session
+    email = request.session.get("student_email")
+
+    if email is None:
+        return JSONResponse({"status":"unauthorized"},status_code=302)
+    
+    current_convo_db_results= database_actions.get_current_convo(email,current_convo_UUID)
+    
+    if current_convo_db_results["status"]!="success":
+        raise HTTPException(status_code=400, detail=current_convo_db_results["message"])
+
+
+    return JSONResponse(content=current_convo_db_results)
+    
 
 
 
@@ -116,15 +138,35 @@ async def ask_question(request: Request):
     if not question:
         return {"error": "Missing question"}
     
+    # store chat message
+    chat_history = []
+
+    if token_UUID != "": #if a UUID was sent and it is not empty
+
+        #retrieve convo history associated with UUID and email combination
+        convo_history = database_actions.get_current_convo(email,token_UUID)
+
+        if convo_history["status"] == "success":#records matching token uuid is found
+            for role, text in convo_history["message"]:
+                if role.lower() == "user":
+                    chat_history.append({"role":"user","text":text})
+                else:
+                    chat_history.append({"role":"gemini","text":text})
+
+        elif convo_history["status"] == "db_error":
+            raise HTTPException(status_code=503,detail=convo_history["message"])
+        
+        elif convo_history["status"] == "no_record": #returned if the token is invalid
+            raise HTTPException(status_code=400,detail=convo_history["message"])
+
 
     try:
+        #pass chat history and user question to this funciton which will return the AI response
         response = get_gemini_response(question, chat_history)
     except ResourceExhausted as e:
         print ("Resource Exhausted : ",e.details)
-        return {"error": "You've hit the quota limit. Please try again later."}
+        raise HTTPException(status_code=429,detail="You've hit the quota limit. Please try again later.")
 
-    chat_history.append({"role": "user", "text": question})
-    chat_history.append({"role": "gemini", "text": response})
     
     #Debug
     print("User: ",question)
@@ -132,7 +174,7 @@ async def ask_question(request: Request):
 
     
     dbResult=None
-    if token_UUID == "": #check if token is empty
+    if token_UUID == "": # if tokenuuid is empty then create it and add the first new conversation
         dbResult = database_actions.store_new_conversation(email,question,response)
 
     else:#if a token is returned then add the ai and user convo to the existing chat history
@@ -148,13 +190,13 @@ async def ask_question(request: Request):
     session_cookie = request.cookies.get("session")
     payload = {"response": response}
 
-    if "token_uuid" in dbResult:
+    if "token_uuid" in dbResult: # if the uuid was generated from a new chat
         payload["token_uuid"] = dbResult["token_uuid"]
-    else:
+    else: # if the UUID is for an existing chat
         payload["token_uuid"] = token_UUID
 
     if session_cookie:
-        response_obj = JSONResponse(content=payload)
+        response_obj = JSONResponse(content=payload) #response and UUID
         response_obj.set_cookie(
             key="session",
             value=session_cookie,
@@ -168,7 +210,7 @@ async def ask_question(request: Request):
     return payload
 
 
-
+ 
 
 # ==============================
 # Signup Endpoint - Validation Only 
@@ -186,8 +228,8 @@ async def signup(request: Request):
     errors = {}
 
     # Extract and clean input fields (remove spaces from start/end)
-    fname = data.get("fname","").strip()
-    lname = data.get("lname","").strip()
+    fname = data.get("fname","").strip().title()
+    lname = data.get("lname","").strip().title()
     email = data.get("email","").lower().strip()#put email in lowercase
     password = data.get("password","")
     confirm_password = data.get("confirm_password","")
@@ -201,12 +243,16 @@ async def signup(request: Request):
         errors["fname_error"] = "First name is required"
     elif not fname.isalpha(): #ensure lname contains only letters
         errors["fname_error"] = "First name must contain only letters"
+    elif len(fname)<3:
+        errors["fname_error"]="First name must be at least 3 letters"
 
     # Last Name validation
     if not lname:
         errors["lname_error"] = "Last name is required"
     elif not lname.isalpha(): #ensure lname contains only letters
         errors["lname_error"] = "Last name must contain only letters"
+    elif len(lname)<3:
+        errors["lname_error"]="Last name must be at least 3 letters"
 
     # Email validation
     if not email:
@@ -267,8 +313,6 @@ async def signup(request: Request):
 
     # If no errors, Redirect
     return JSONResponse(content={"redirect": "/static/mail.html"}, status_code=200)
-
-
 
 
 
@@ -341,6 +385,7 @@ async def activate_account(request: Request):
     return JSONResponse(content={"message":result["message"]}, status_code=200)
  
 
+
 @app.get("/activate", response_class=HTMLResponse)
 async def serve_activate_page():
     return FileResponse("static/activate.html")
@@ -361,7 +406,7 @@ async def verify_login(request: Request):
     errors = {}
 
     # Extract and sanitize input fields
-    email = data.get("email", "").strip()
+    email= data.get("email", "").strip().lower()
     password = data.get("password", "").strip()
 
     # Validate email format and domain

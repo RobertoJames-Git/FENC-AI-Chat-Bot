@@ -87,7 +87,7 @@ function formatMarkdown(text) {
     stack.pop();
   }
 
-  return html;
+  return html.trim();
 }
 
 
@@ -95,6 +95,24 @@ let ai_and_user_container_populated =false;
 let isOrientedPortrait =false;
 let conversationTokenUUID = "";
 
+function removeWelcomeMessage(){
+    
+    ai_and_user_container_populated = true; //indicate that text has been added to the container that shows convo history
+
+    document.getElementById("ai_and_user_container").style.display="block";
+    document.getElementById("current_convo_container").style.justifyContent="flex-start";
+
+    if(isOrientedPortrait){//if screen is portrait then allow div to support 3 rows
+        document.getElementById("main_container").style.gridTemplateRows="50px 1fr auto";
+    
+    }
+    else{ //if screen is lanscape then we would only support 2 rows
+    document.getElementById("main_container").style.gridTemplateRows="1fr auto";
+    
+
+    }
+
+}
 
 async function sendQuestion() {
     const userInput = document.getElementById("userInput").value.trim();//retrieve what the user entered in the input
@@ -104,22 +122,11 @@ async function sendQuestion() {
     return;
     }
 
-    document.getElementById("userInput").value = ""; //clear inpur field after user sends question
+    document.getElementById("userInput").value = ""; //clear input field after user sends question
 
     insertUserMessage("user",userInput);//add users message to the container above the textbox
-	ai_and_user_container_populated = true; //indicate that text has been added to the container that shows convo history
-    document.getElementById("ai_and_user_container").style.display="block";
-    document.getElementById("current_convo_container").style.justifyContent="flex-start";
 
-	if(isOrientedPortrait){//if screen is portrait then allow div to support 3 rows
-		    document.getElementById("main_container").style.gridTemplateRows="50px 1fr auto";
-    
-	}
-	else{ //if screen is lanscape then we would only support 2 rows
-    document.getElementById("main_container").style.gridTemplateRows="1fr auto";
-    
-
-	}
+    removeWelcomeMessage();
 
     //add loading icon
     const loadingIcon = document.createElement('div');//create div
@@ -140,14 +147,15 @@ async function sendQuestion() {
     body: JSON.stringify({ question: userInput, token_uuid : conversationTokenUUID})
     });
     const data = await res.json();
+
     console.log(data);
     
     if(data.response){
 
       
-      conversationTokenUUID = data.token_uuid;
+      conversationTokenUUID = data.token_uuid; //retrieve the uuid and add it to url
       const newUrl = `/chat/${conversationTokenUUID}`;
-      window.history.pushState({}, '', newUrl);//update url without a page reload
+      window.history.pushState({}, '', newUrl);//update url with uuid without a page reload
 
       //The AI may return data with astericks and other symbo and this function
       // removes those symbols and use them as indicator to know when to style the text or create a list
@@ -155,7 +163,7 @@ async function sendQuestion() {
 
     }
     else{
-        displayServerError(data.error);
+        displayServerError(data.detail);
         loadingIcon.remove()
         return;
     }
@@ -292,8 +300,7 @@ function expandSidebar(){
 
 	document.getElementById('student_fullname').style.display='inline';
 	document.getElementById('new_chat_container').style.textAlign ="";
-
-	sidebarIcon.src="static/images/sidebar_close.svg"; //change image to represent if the sidebar eill expand or collapse
+	sidebarIcon.src="/static/images/sidebar_close.svg"; //change image to represent if the sidebar eill expand or collapse
 	sidebarIcon.title="Close Sidebar";//user sees appropriate title when they hover
 }
 
@@ -321,7 +328,7 @@ function controlSidebar() {
 
 	//reduce width of sidebar 
 	sidebar.style.width="40px";
-	sidebarIcon.src="static/images/sidebar_open.svg";
+	sidebarIcon.src="/static/images/sidebar_open.svg";
 	sidebarIcon.title="Open Sidebar";
 	document.getElementById('new_chat_container').style.textAlign ='center';
 
@@ -498,3 +505,59 @@ function closePortraitSidebar(){
 	portraitOpenSidebar=false;
 
 }
+
+
+
+function load_current_convo_from_UUID(){
+    const currentURL = window.location.href;
+
+    if(!currentURL.includes("/chat/")){
+        return;
+    }
+
+    const tokenUUID = currentURL.split('/').pop();//remove and return the last element which is the UUID for the chat
+    console.log(tokenUUID)
+
+    fetch(`/current_convo/${tokenUUID}`)
+    .then(async response=>{
+
+        if(!response.ok){
+            const errData = await response.json();
+            throw new Error(errData.detail);
+        }
+
+        return response.json();
+    })
+    .then(data =>{
+
+        removeWelcomeMessage();
+        
+        //display user and AI message on the page
+        for (const eachElement of data.message){
+            console.log(eachElement);
+
+            if(eachElement[0].toLowerCase() === "user"){
+                insertUserMessage("user",eachElement[1] );
+            }
+            else {
+                insertUserMessage("ai_response",formatMarkdown(eachElement[1]) );
+            }
+
+        }
+
+        //Update the UUID of the current message so that when messages are sent they are appended to the current convo history
+        conversationTokenUUID = tokenUUID;
+
+
+    })
+    .catch(error=>{
+        displayServerError(error)
+    })
+    
+}
+
+//check if the user access the page with a UUID in their url and retrive the chat history
+load_current_convo_from_UUID();
+
+const send_arrow = document.getElementById("send_arrow");
+send_arrow.addEventListener('click',sendQuestion)

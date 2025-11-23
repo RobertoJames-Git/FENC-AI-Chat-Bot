@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
             container.removeChild(loadingMsg); 
             container.style.display="block";
             container.style.height="auto";//allow container heigh to expand to display validation errors
-            document.getElementById('right_column_content').style.display="block";//display from content
+            document.getElementById('right_column_content').style.display="block";//display form
 
 
         }
@@ -67,7 +67,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!response.ok) {
                 removeLoadingIcon();
-                // If response is not OK, display errors from backend
+                // If response is NOT OK, display errors from backend
                 if (result.email_error) {
                     document.getElementById("email_error").innerHTML = "<br>" + result.email_error;
                 }
@@ -82,7 +82,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 }
             } else {
-                // If login is successful, redirect to chatbt
+                removeLoadingIcon();
+                // If login is successful, redirect to chatbot
                 window.location.href = "/"; // redirect to index
             }
 

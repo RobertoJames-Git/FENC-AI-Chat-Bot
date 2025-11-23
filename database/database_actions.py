@@ -314,3 +314,38 @@ def get_conversation_token_UUID(email):
         conn.close()
 
 
+
+def get_current_convo (email,current_convo_UUID):
+
+    conn = get_db_connection()
+
+    if conn is None:
+        return {"status": "db_error", "message": database_conn_error_msg}
+    
+    try:
+        cursor = conn.cursor()
+        sql = '''SELECT 
+                a.role,
+                a.message
+                FROM chat_history AS a
+                INNER JOIN conversation AS b 
+                ON a.conversation_id = b.conversation_id
+                WHERE b.email = %s
+                AND b.token_UUID = %s
+                AND b.deleted_at IS NULL
+                ORDER BY a.created_at DESC;'''
+        
+        cursor.execute(sql, (email,current_convo_UUID,))
+        rows = cursor.fetchall() #get all records
+
+        if rows:
+            return{"status":"success","message":rows}
+        else:
+            return{"status":"no_records","message":"Unable to retrieve conversation"}
+
+    except Exception as e:
+        print("Database query Failed", str(e))
+        return {"status": "db_error", "message": "Failed to retrieve conversation history"}
+    finally:
+        cursor.close()
+        conn.close()
