@@ -528,6 +528,7 @@ function getUUIDFromUrl() {
     // Accepts only a UUID-like pattern: xxxx-xxxx-xxxx-xxxx...
     const pattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/; 
     if (!pattern.test(uuid)) {//if pattern is not mtched then uuid is invalid
+        window.history.pushState({}, '', '/');//reset url with uuid without a page reload
         return null;
     }
 
