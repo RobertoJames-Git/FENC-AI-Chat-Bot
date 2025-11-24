@@ -95,6 +95,13 @@ let ai_and_user_container_populated =false;
 let isOrientedPortrait =false;
 let conversationTokenUUID = "";
 
+function addUuidToUrl(currentUUID){
+
+    const newUrl = `/chat/${currentUUID}`;
+    window.history.pushState({}, '', newUrl);//update url with uuid without a page reload
+}
+
+
 function removeWelcomeMessage(){
     
     ai_and_user_container_populated = true; //indicate that text has been added to the container that shows convo history
@@ -152,17 +159,18 @@ async function sendQuestion() {
     
     if(data.response){
 
-      
-      conversationTokenUUID = data.token_uuid; //retrieve the uuid and add it to url
-      const newUrl = `/chat/${conversationTokenUUID}`;
-      window.history.pushState({}, '', newUrl);//update url with uuid without a page reload
+        conversationTokenUUID = data.token_uuid; //retrieve the uuid and add it to url
+        //retrieve the uuid and update url with uuid without a page reload
+        addUuidToUrl(data.token_uuid);
 
-      //The AI may return data with astericks and other symbo and this function
-      // removes those symbols and use them as indicator to know when to style the text or create a list
-      formattedResponse = formatMarkdown(data.response);
+
+        //The AI may return data with astericks and other symbols and this function
+        // removes those symbols and use them as indicator to know when to style the text or create a list
+        formattedResponse = formatMarkdown(data.response);
 
     }
-    else{
+    else{ // if the Server returns errors then they are displayed
+
         displayServerError(data.detail);
         loadingIcon.remove()
         return;
@@ -507,16 +515,37 @@ function closePortraitSidebar(){
 }
 
 
-
-function load_current_convo_from_UUID(){
+function getUUIDFromUrl() {
     const currentURL = window.location.href;
 
-    if(!currentURL.includes("/chat/")){
-        return;
+    if (!currentURL.includes("/chat/")) {
+        return null;
     }
 
-    const tokenUUID = currentURL.split('/').pop();//remove and return the last element which is the UUID for the chat
-    console.log(tokenUUID)
+    const uuid = currentURL.split('/').pop();
+
+    // If tampered → return null
+    // Accepts only a UUID-like pattern: xxxx-xxxx-xxxx-xxxx...
+    const pattern = /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/; 
+    if (!pattern.test(uuid)) {//if pattern is not mtched then uuid is invalid
+        return null;
+    }
+
+    return uuid;
+}
+
+
+function load_current_convo_from_UUID(tokenUUID){
+
+
+    if(!tokenUUID){//if a value was not passed because of a page load then the uuid is retrieved from the url
+        tokenUUID = getUUIDFromUrl();
+    }
+
+    
+    if (!tokenUUID){
+        return null;
+    }
 
     fetch(`/current_convo/${tokenUUID}`)
     .then(async response=>{
@@ -545,19 +574,52 @@ function load_current_convo_from_UUID(){
 
         }
 
-        //Update the UUID of the current message so that when messages are sent they are appended to the current convo history
+        //Update the UUID of the current message so that when other messages are sent they are appended to the current convo history in the database
         conversationTokenUUID = tokenUUID;
 
 
     })
     .catch(error=>{
-        displayServerError(error)
+        //if an error occurred during api request then the message will be shown to users
+        displayServerError(error);
     })
     
+}
+
+
+function addEventListenerToLoadPastConversations(){
+    const prevConvoElements = document.querySelectorAll('.previous_conversations');
+
+    for (const eachElement of prevConvoElements){
+
+        
+        console.log(eachElement);
+        const element_UUID=eachElement.getAttribute("token_uuid");
+
+        eachElement.addEventListener('click',()=>{
+            const uuidFromUrl = element_UUID;
+
+            if (!uuidFromUrl){//if uuid in url is invalid
+                return;
+            }
+
+            //if user reselects the same element then this prevents me from calling the database again for the chat history
+            if(conversationTokenUUID === uuidFromUrl){
+                return;
+            }
+
+            //remove previous chat history before showing what the user
+            document.getElementById('ai_and_user_container').innerHTML='';
+            addUuidToUrl(element_UUID);
+            load_current_convo_from_UUID();
+        });
+    }
 }
 
 //check if the user access the page with a UUID in their url and retrive the chat history
 load_current_convo_from_UUID();
 
+addEventListenerToLoadPastConversations();
+
 const send_arrow = document.getElementById("send_arrow");
-send_arrow.addEventListener('click',sendQuestion)
+send_arrow.addEventListener('click',sendQuestion);

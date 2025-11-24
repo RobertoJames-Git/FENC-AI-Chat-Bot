@@ -77,7 +77,7 @@ body{
 }
 
 
-.side_panel {
+.previous_conversations {
     display: flex;
     align-items: center; /* vertically center image and text */
     gap: 8px; /* optional: space between image and text */
@@ -92,7 +92,7 @@ body{
     opacity:1 ;
 }
 
-.side_panel:hover{
+.previous_conversations:hover{
     border-left:20px solid #1946da;
 }
 
@@ -404,7 +404,7 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 }
 
 
-.side_panel,#new_chat_container, #sidebar_heading{
+.previous_conversations,#new_chat_container, #sidebar_heading{
 
   white-space: nowrap;  /* prevents wrapping */
   overflow: hidden;     /* hides anything that doesn't fit */
