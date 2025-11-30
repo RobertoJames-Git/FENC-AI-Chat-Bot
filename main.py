@@ -130,10 +130,10 @@ async def ask_question(request: Request):
 
 
     data = await request.json()
-    print (data)
     
     question = (data.get("question") or "").strip()
     token_UUID = (data.get("token_uuid") or "").strip()
+    
     #get conversatoken token UUID from frontend
     if not question:
         return {"error": "Missing question"}
@@ -432,7 +432,7 @@ async def verify_login(request: Request):
     # Retrieve login attempt count and lockout timestamp from session
     user_attempts = request.session.get("student_login_attempt", 5)
     lockout_start = request.session.get("student_login_lockout_start")
-    
+
 
     # If user has exhausted attempts, check if cooldown is still active
     if user_attempts <= 1:

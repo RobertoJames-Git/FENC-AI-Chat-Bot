@@ -333,7 +333,7 @@ def get_current_convo (email,current_convo_UUID):
                 WHERE b.email = %s
                 AND b.token_UUID = %s
                 AND b.deleted_at IS NULL
-                ORDER BY a.created_at DESC;'''
+                ORDER BY a.created_at ASC;'''
         
         cursor.execute(sql, (email,current_convo_UUID,))
         rows = cursor.fetchall() #get all records

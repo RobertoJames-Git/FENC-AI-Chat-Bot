@@ -110,7 +110,7 @@ body{
     /* Sizing and layout */
     box-sizing: border-box;
     width: 100%;
-    padding: 10px;
+    padding: 10px 10px 0px 10px;
     
     /* Font and text */
     font-family: sans-serif; /* Use a consistent font */
@@ -142,7 +142,7 @@ body{
 #textarea_container{
 
     height: auto;
-    padding: 10px;
+    padding: 10px 10px 0px 10px;
     background-color: #303030;
     border-radius: 10px 10px 0px 0px;
 }
@@ -450,20 +450,16 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 }
 
 
-#errorMsg {
-  position: fixed;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: #333;
-  color: white;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-  z-index: 10;
-  max-width: 300px;
-  outline: 2px solid red;
-  display: none;
 
+
+
+
+#no_convo{
+    outline: 2px solid #2554f3;
+    margin-top: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
 }
 
 #errorMsg h2{
@@ -471,13 +467,25 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   margin-bottom: 10px;
 }
 
+#errorMsg {
+  position: fixed;
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: top 0.5s ease;
+  background-color: #333;
+  padding: 10px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  z-index: 10;
+  max-width: 300px;
+  outline: 2px solid red;
+  display: none;
+}
 
 
 
-#no_convo{
-  outline: 2px solid #2554f3;
-  margin-top: 10px;
-  padding: 10px;
-  border-radius: 10px;
-  text-align: center;
+#errorMsg.show {
+  top: 100px;
+  display: block;
 }
