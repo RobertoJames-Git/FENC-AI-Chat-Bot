@@ -1,11 +1,7 @@
 import { textarea } from "./events.js";
 import { displayServerError, addMessageToUI, removeWelcomeMessage } from "./ui.js";
 import { addUuidToUrl, formatMarkdown,getUUIDFromUrl } from "./utility.js";
-
-
-export const state = {
-    conversationTokenUUID: null
-};
+import { state } from "./state.js";
 
 
 export async function sendQuestion() {

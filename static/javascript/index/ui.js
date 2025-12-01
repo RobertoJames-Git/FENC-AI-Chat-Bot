@@ -1,139 +1,162 @@
+import { state } from "./state.js";
 import { addUuidToUrl } from "./utility.js"; // This import is duplicated, but one is needed. Let's keep it clean.
-import { state,load_current_convo_from_UUID } from "./api.js"; // This is the function that needs to be imported.
+import { load_current_convo_from_UUID } from "./api.js"; // This is the function that needs to be imported.
 
 
-let hasChatHistory =false;
-let isOrientedPortrait =false;
-let portraitOpenSidebar=false;
+
 let chatHistoryContainer= document.getElementById('ai_and_user_container');
+/*
+| Flag                   | Purpose                                                                 |
+| ---------------------- | ----------------------------------------------------------------------- |
+| **isSidebarOpen**      | Tracks **visibility** (mainly mobile: open vs hidden)                   |
+| **isSidebarLocked**    | Tracks **behavior/mode** (desktop: permanent vs overlay)                |
+| **isSidebarCollapsed** | Tracks **size/layout** (desktop: collapsed/thin vs expanded/full width) |
+
+*/
+
+let isPortrait = window.innerWidth < window.innerHeight;;
+let isSidebarOpen = true;
+let isSidebarLocked = true;
+let isSidebarCollapsed = false;
+const portraitSidebarControl = document.getElementById('portrait_sidebar_control');
+const mainContainer = document.getElementById('main_container');
+const sidebar = document.getElementById('sidebar');
+
+
+/*by default sidebar is not open on portrait(mobile) but it is open by default on landscape */
+if(isPortrait){
+    isSidebarOpen = false;
+}
+else{
+    isSidebarOpen = true;
+}
+
+
+export function applyResponsiveStyles() {
+    isPortrait = window.innerWidth < window.innerHeight;
+
+    if(!isPortrait){//landscape 
+
+        /* reset to landscape settings */
+        mainContainer.style.gridTemplateColumns='';
+
+        if(state.hasChatHistory){//if coversation history is shown
+           mainContainer.style.gridTemplateRows='1fr auto';
+        }else{//if coversation history is NOT shown
+            mainContainer.style.gridTemplateRows='';
+        }
+
+        sidebar.style.display='';
+        portraitSidebarControl.style.display='';
+
+        if (isSidebarOpen&& !isSidebarCollapsed){
+            sidebar.style='';
+            document.getElementById('sidebar-overlay').style.display='none';
+
+        }
+
+        
+
+        /*  expand the sidepanel if it was collapsed in landscape(!isPortrai)
+            then going to portrait orientation
+            then comping back to landscape  */
+        if(!isSidebarCollapsed){
+        
+            document.getElementById('student_fullname').style.display='inline';
+    
+            controlSidebar('220px',false,'/static/images/sidebar_close.svg','Close Sidebar','','inline','block');
+
+        }
+    
+
+        
+    }
+    else if(isPortrait){
+        isSidebarLocked = false;
+        isSidebarCollapsed = false;
+
+        portraitSidebarControl.style.display='flex';
+
+        mainContainer.style.gridTemplateColumns='auto';
+        mainContainer.style.gridTemplateRows="40px auto 60%";
+
+        if(state.hasChatHistory){
+            mainContainer.style.gridTemplateRows='40px 1fr auto';
+        }
+
+        if (!isSidebarOpen){
+            sidebar.style.display='none';
+
+        }
+    }
+    
+}
+
+
+export function manageSidebar() {
+
+	if (isPortrait){
+		sidebar.style.display='none';
+		document.getElementById('sidebar-overlay').style.display='none';
+		return;
+	}
+	
+
+	//expand the sidepanel if it is collapsed
+	if(isSidebarCollapsed){
+    
+        document.getElementById('student_fullname').style.display='inline';
+
+        controlSidebar('220px',false,'/static/images/sidebar_close.svg','Close Sidebar','','inline','block');
+        
+		return;//no more changes will take effect
+	}
+
+
+	//reduce width of sidebar for landscape orientation
+
+    controlSidebar('40px',true,'/static/images/sidebar_open.svg','Open Sidebar','center','none','none');
+
+
+
+}
+
+function controlSidebar(width,sidebarCollpseState,sidebarIconSrc,sidebarIconTitle,textAlign,sidebarTextStyle,convoHistoryDisplayStyle){
+    const sidebarIcon = document.getElementById('sidebar_icon');
+    sidebar.style.width=width;
+    isSidebarCollapsed=sidebarCollpseState;
+	sidebarIcon.src=sidebarIconSrc;
+	sidebarIcon.title=sidebarIconTitle;
+	document.getElementById('new_chat_container').style.textAlign =textAlign;
+
+	controlSidebarText(sidebarTextStyle);//hide sidebar text
+	document.getElementById("conversation_history_container").style.display=convoHistoryDisplayStyle;
+
+    isSidebarOpen=!sidebarCollpseState //keeps track of if sidebar is open or not
+
+
+}
+
 
 
 export function removeWelcomeMessage(){
     
-    hasChatHistory = true; //indicate that text has been added to the container that shows convo history
+    state.hasChatHistory = true; //indicate that text has been added to the container that shows convo history
 
     chatHistoryContainer.style.display="block";
     document.getElementById("current_convo_container").style.justifyContent="flex-start";
 
-    if(isOrientedPortrait){//if screen is portrait then allow div to support 3 rows
+    if(isPortrait){//if screen is portrait then allow div to support 3 rows
         document.getElementById("main_container").style.gridTemplateRows="50px 1fr auto";
     
-    }
+    }    
     else{ //if screen is lanscape then we would only support 2 rows
-    document.getElementById("main_container").style.gridTemplateRows="1fr auto";
+    document.getElementById("main_container").style.gridTemplateRows="1fr auto";    
     
 
     }
 
-}
-
-export function applyResponsiveStyles() {
-
-
-	const isNarrowScreen_960 = window.innerWidth <= 960;
-	const isNarrowScreen_750 = window.innerWidth <= 750;
-	let sidebar = document.getElementById("sidebar");
-	const isPortrait = window.matchMedia("(orientation: portrait)").matches;
-	const main_container = document.getElementById('main_container');
-	const userItems = document.getElementById('user_interaction_items');
-	const aiContainer = document.getElementById('ai_and_user_container');
-	const userContainer = document.getElementById('user_interaction_container');
-	const currentConvoContainer = document.getElementById('current_convo_container');
-	const portrait_sidebar_control = document.getElementById('portrait_sidebar_control');
-
-	function narrowLandscapeScreen(){
-		
-		userItems.style.width = 'auto';
-		// Get actual pixel width of userItems
-		const actualWidth = userItems.offsetWidth;
-		// Apply adjusted width to aiContainer
-		aiContainer.style.width = (actualWidth - 20) + 'px';
-		// Apply padding
-		userContainer.style.padding = '0px 20px';
-
-
-	}
-
-
-    // reset element that may be potentially changed
-    main_container.style.gridTemplateColumns = "";
-    main_container.style.gridTemplateRows = "";
-    currentConvoContainer.style.padding = "";
-	portrait_sidebar_control.style.display='none';
-
-	if(!portraitOpenSidebar){
-		sidebar.style.display='';
-	}
-
-
-	//check if container with current ai and user history has content in it and 
-	// change screen elements accordingly
-	if(hasChatHistory){
-		
-		main_container.style.gridTemplateRows="1fr auto";
-
-	}
-	else{ //if the continer with current convo historyy is blank
-		main_container.style.gridTemplateRows='40% 60%';
-
-	}
-
-	
-
-	if(isPortrait||isNarrowScreen_750){
-
-		if(!portraitOpenSidebar){
-		sidebar.style.display='none';
-		}
-
-		main_container.style.gridTemplateColumns='auto';
-		narrowLandscapeScreen();
-		portrait_sidebar_control.style.display='flex';
-
-		if(hasChatHistory){ // if container with current convo history is populated
-			
-			main_container.style.gridTemplateRows="50px 1fr auto";
-
-		}
-		else{ //if the container with current convo history is blank
-
-			main_container.style.gridTemplateRows="50px auto 60%";
-
-		}
-
-		
-
-		isOrientedPortrait=true;
-
-		console.log("Portrait or less than or equl 750");
-
-	}
-	//check if windows size is equal to or smaller than 960px
-	else if (isNarrowScreen_960) {
-
-		narrowLandscapeScreen();
-		isOrientedPortrait=false;
-
-		closePortraitSidebar()
-		sidebar.style.display="";
-		console.log("less than or equl 950");
-	}
-	else {//landscape
-		// Reset styles for wider screens
-		userItems.style.width = '';
-		aiContainer.style.width = '';
-
-		userContainer.style.padding = '';
-		aiContainer.style.padding = '';
-		currentConvoContainer.style.padding = '0px';
-				isOrientedPortrait=false;
-		console.log("else portion");
-	}
-  
-}
-
-
-
+}    
 
 function controlSidebarText(action){
     const sidebar_text = document.querySelectorAll('.sidebar_text');
@@ -145,97 +168,40 @@ function controlSidebarText(action){
 }
 
 
-function expandSidebar(){
-
-	let sidebar = document.getElementById("sidebar");
-	let sidebarIcon = document.getElementById('sidebar_icon');
-	sidebar.style.width="220px";
-	controlSidebarText("inline");//display sidebar text
-	document.getElementById("conversation_history_container").style.display='block';//show chat history
-
-	document.getElementById('student_fullname').style.display='inline';
-	document.getElementById('new_chat_container').style.textAlign ="";
-	sidebarIcon.src="/static/images/sidebar_close.svg"; //change image to represent if the sidebar eill expand or collapse
-	sidebarIcon.title="Close Sidebar";//user sees appropriate title when they hover
-}
-
-export function controlSidebar() {
-
-	let sidebar = document.getElementById("sidebar");
-	let sidebarIcon = document.getElementById('sidebar_icon');
-
-
-	if (isOrientedPortrait){
-		sidebar.style.display='none';
-		document.getElementById('sidebar-overlay').style.display='none';
-		return;
-	}
-	
-
-	//expand the sidepanel
-	if(sidebar.style.width=="40px"){
-
-		expandSidebar();
-
-		return;//no more changes will take effect
-	}
-
-
-	//reduce width of sidebar 
-	sidebar.style.width="40px";
-	sidebarIcon.src="/static/images/sidebar_open.svg";
-	sidebarIcon.title="Open Sidebar";
-	document.getElementById('new_chat_container').style.textAlign ='center';
-
-	controlSidebarText("none");//hide sidebar text
-	document.getElementById("conversation_history_container").style.display='none';
-
-
-}
-
-
-
 
 export function controlPortraitSidebar() {
+    
 
-  const sidebar = document.getElementById('sidebar');
-  const overlay = document.getElementById('sidebar-overlay');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
 
-  expandSidebar();
+    controlSidebar('220px',false,'/static/images/sidebar_close.svg','Close Sidebar','','inline','block');
 
-  // Initial sidebar styles
-  sidebar.style.position = 'fixed';
-  sidebar.style.top = '0';
-  sidebar.style.left = '0';
-  sidebar.style.zIndex = '3';
-  sidebar.style.height = '98vh';
-  sidebar.style.width = '0px';
-  sidebar.style.display = 'flex';
+    // Initial sidebar styles
+    sidebar.style.position = 'fixed';
+    sidebar.style.top = '0';
+    sidebar.style.left = '0';
+    sidebar.style.zIndex = '3';
+    sidebar.style.height = '98vh';
+    sidebar.style.width = '0px';
+    sidebar.style.display = 'flex';
 
-  // Apply transition via CSS (if not already in stylesheet)
-  sidebar.style.transition = 'width 0.2s ease';
-  sidebar.style.overflow = 'hidden';
+    // Apply transition via CSS (if not already in stylesheet)
+    sidebar.style.transition = 'width 0.2s ease';
+    sidebar.style.overflow = 'hidden';
 
-  // Trigger width change after a short delay
-  setTimeout(() => {
-      sidebar.style.width = '220px';
-  }, 10); // 10ms is enough to allow the browser to register the initial width
+    // Trigger width change after a short delay
+    setTimeout(() => {
+        sidebar.style.width = '220px';
+    }, 10); // 10ms is enough to allow the browser to register the initial width
 
-  // Show overlay
-  overlay.style.display = 'block';
-  portraitOpenSidebar = true;
+    // Show overlay
+    overlay.style.display = 'block';
 
-  overlay.onclick = () => {
-      closePortraitSidebar();
-  };
+
 }
 
 
-function closePortraitSidebar() {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('sidebar-overlay').classList.remove('show');
-    portraitOpenSidebar = false;
-}
 
 
 
@@ -301,7 +267,6 @@ function addEventListenerToLoadPastConversations(){
     for (const eachElement of prevConvoElements){
 
         
-        console.log(eachElement);
         const element_UUID=eachElement.getAttribute("token_uuid");
 
         eachElement.addEventListener('click',()=>{

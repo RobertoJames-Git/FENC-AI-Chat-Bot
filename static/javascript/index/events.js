@@ -1,4 +1,4 @@
-import { controlSidebar,controlPortraitSidebar,applyResponsiveStyles } from "./ui.js";
+import { manageSidebar,controlPortraitSidebar,applyResponsiveStyles } from "./ui.js";
 import { sendQuestion } from "./api.js";
 
 export const textarea = document.getElementById('userInput');
@@ -45,7 +45,6 @@ document.addEventListener("click", (e) => {
 });
 
 
-console.log("Run")
 
 // Reapply styles on window resize
 window.addEventListener('resize', applyResponsiveStyles);
@@ -54,7 +53,7 @@ const sendArrow = document.getElementById("send_arrow");
 sendArrow.addEventListener('click',sendQuestion);
 
 const sidebarIcon = document.getElementById("sidebar_icon")
-sidebarIcon.addEventListener('click',controlSidebar)
+sidebarIcon.addEventListener('click',manageSidebar)
 
 const sidebarIconPortrait = document.getElementById('sidebar_icon_portrait');
 sidebarIconPortrait.addEventListener('click',controlPortraitSidebar)
@@ -86,8 +85,11 @@ document.addEventListener("DOMContentLoaded", function () {
         }
       });
     }
-  });
-  
+});
 
-  
-applyResponsiveStyles();
+const overlay = document.getElementById('sidebar-overlay');
+overlay.addEventListener('click',manageSidebar);
+
+
+
+applyResponsiveStyles() 

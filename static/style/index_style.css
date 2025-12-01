@@ -18,9 +18,11 @@ body{
 #main_container{
     display: grid;
     grid-template-columns: max-content auto;
-    grid-template-rows: 40% 60%; /* Define two rows */
+    grid-template-rows: 45% 55%; /* Define two rows */
     height: 100vh;  
 }
+
+
 
 #sidebar {
     display: flex;
@@ -165,7 +167,8 @@ outline: 2px solid white;
     display: flex;
     flex-direction: column;
     margin: auto;
-    width: 700px;
+    width: calc(100% - 50px);
+    max-width: 700px;
     border-bottom: 3px solid #1946da;
     border-radius: 12px;
     background-color: #303030;
@@ -197,7 +200,7 @@ outline: 2px solid white;
   display: none;
   flex-shrink: 0;
   flex-grow: 1;
-  width: 700px;
+  width: calc(100% - 20px);
   margin: 0 auto;
   margin-bottom: 10px;
   padding-top: 10px;
@@ -413,23 +416,27 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 
 
 #portrait_sidebar_control{
-  display: flex;               
+  display: none; 
+  /*to view set to display:flex*/              
   align-items: center;
   height: 30px;
   padding: 5px;
 }
 
 
-#portrait_top_heading{
-  display: flex;
-  align-items: center;
-  margin: auto;
-  column-gap: 10px;
-  background-color: #424242;
-  padding: 5px 10px;
-  border-radius: 10px;
-}
+#portrait_top_heading {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+    background-color: #424242;
+    padding: 5px 10px;
+    border-radius: 10px;
+  
+    position: fixed;       /* position relative to viewport */
+    left: 50%;             /* move to middle of screen */
+    transform: translateX(-50%); /* shift back half its width */
 
+  }
 
 #sidebar_icon_portrait{
   cursor: pointer;
@@ -448,9 +455,6 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   display: none; /* Hidden by default */
 
 }
-
-
-
 
 
 
@@ -489,3 +493,23 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   top: 100px;
   display: block;
 }
+
+
+@media screen and (orientation:portrait){
+    #sidebar{
+
+        display: none;
+    }
+
+}
+
+
+@media  screen and(orientation: landscape) {
+    
+}
+
+
+
+
+
+
