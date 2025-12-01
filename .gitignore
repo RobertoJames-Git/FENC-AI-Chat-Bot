@@ -10,3 +10,4 @@ Other files/test_credentials.txt
 Other files/Improvements.txt
 fastapi_venv/
 miscellaneous/
+database/__pycache__
