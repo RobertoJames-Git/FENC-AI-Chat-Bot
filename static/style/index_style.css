@@ -167,8 +167,6 @@ outline: 2px solid white;
     display: flex;
     flex-direction: column;
     margin: auto;
-    width: calc(100% - 50px);
-    max-width: 700px;
     border-bottom: 3px solid #1946da;
     border-radius: 12px;
     background-color: #303030;
@@ -200,7 +198,6 @@ outline: 2px solid white;
   display: none;
   flex-shrink: 0;
   flex-grow: 1;
-  width: calc(100% - 20px);
   margin: 0 auto;
   margin-bottom: 10px;
   padding-top: 10px;
@@ -239,6 +236,15 @@ outline: 2px solid white;
 list-style-type: disc;
 margin: 0;
 padding-left: 2.4em;   /* indent level 1 */
+
+}
+
+.ai_response li{
+    margin-bottom: 10px;
+    line-height: 1.3;
+}
+.ai_response:last-child{
+    margin-bottom: 0px;
 }
 
 /* 2nd-level lists */
@@ -495,21 +501,26 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
 }
 
 
-@media screen and (orientation:portrait){
+@media screen and (orientation:portrait) {
     #sidebar{
 
         display: none;
     }
 
+    .auto-max-width-700{
+        width: calc(100% - 20px);
+    }
+
 }
 
 
-@media  screen and(orientation: landscape) {
+@media screen and (orientation: landscape) {
+    .auto-max-width-700{
+        width: 80%;
+        max-width: 1000px;
+    }        
     
-}
-
-
-
+}        
 
 
 
