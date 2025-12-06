@@ -1,16 +1,15 @@
 import { state } from "./state.js";
-import { addUuidToUrl } from "./utility.js"; // This import is duplicated, but one is needed. Let's keep it clean.
+import { addUuidToUrl, resetUrl } from "./utility.js"; // This import is duplicated, but one is needed. Let's keep it clean.
 import { load_current_convo_from_UUID } from "./api.js"; // This is the function that needs to be imported.
 
 
 
 let chatHistoryContainer= document.getElementById('ai_and_user_container');
 /*
-| Flag                   | Purpose                                                                 |
-| ---------------------- | ----------------------------------------------------------------------- |
-| **isSidebarOpen**      | Tracks **visibility** (mainly mobile: open vs hidden)                   |
-| **isSidebarLocked**    | Tracks **behavior/mode** (desktop: permanent vs overlay)                |
-| **isSidebarCollapsed** | Tracks **size/layout** (desktop: collapsed/thin vs expanded/full width) |
+
+isSidebarOpen       - Tracks **visibility** (mainly mobile: open vs hidden)
+isSidebarLocked     - Tracks **behavior/mode** (desktop: permanent vs overlay)
+isSidebarCollapsed  - Tracks **size/layout** (desktop: collapsed/thin vs expanded/full width)
 
 */
 
@@ -147,16 +146,17 @@ export function removeWelcomeMessage(){
     document.getElementById("current_convo_container").style.justifyContent="flex-start";
 
     if(isPortrait){//if screen is portrait then allow div to support 3 rows
-        document.getElementById("main_container").style.gridTemplateRows="50px 1fr auto";
+        mainContainer.style.gridTemplateRows="50px 1fr auto";
     
     }    
     else{ //if screen is lanscape then we would only support 2 rows
-    document.getElementById("main_container").style.gridTemplateRows="1fr auto";    
+        mainContainer.style.gridTemplateRows="1fr auto";    
     
 
     }
 
 }    
+
 
 function controlSidebarText(action){
     const sidebar_text = document.querySelectorAll('.sidebar_text');
@@ -237,7 +237,7 @@ export function displayServerError(errorMsg) {
 
 
 export function addMessageToUI(userRole,messageText) {
-    document.getElementById("welcome_message")?.remove();//removes welcome message if it exists
+    document.getElementById("welcome_message").style.display='none';//removes welcome message if it exists
     
     if (messageText === "") return; // Avoid empty messages
 
@@ -266,7 +266,6 @@ function addEventListenerToLoadPastConversations(){
 
     for (const eachElement of prevConvoElements){
 
-        
         const element_UUID=eachElement.getAttribute("token_uuid");
 
         eachElement.addEventListener('click',()=>{
@@ -290,6 +289,27 @@ function addEventListenerToLoadPastConversations(){
 }
 
 
+
+export function newChat(){
+
+    state.conversationTokenUUID = null //new chat wil now have conversationUUID - it will be created by backend
+    state.hasChatHistory=false;
+    resetUrl()
+    //remove previous chat history before showing current chat history
+    const aiAndUserContainer=document.getElementById('ai_and_user_container');
+    aiAndUserContainer.innerHTML='';
+    aiAndUserContainer.style.display='none';
+
+    document.getElementById('current_convo_container').style='';
+    
+    document.getElementById("welcome_message").style.display='block';
+
+    document.getElementById('main_container').style='';
+    applyResponsiveStyles();
+    
+    
+
+}
 
 
 addEventListenerToLoadPastConversations();

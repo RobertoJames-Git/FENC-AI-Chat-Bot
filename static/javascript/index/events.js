@@ -1,5 +1,6 @@
-import { manageSidebar,controlPortraitSidebar,applyResponsiveStyles } from "./ui.js";
-import { sendQuestion } from "./api.js";
+import { manageSidebar,controlPortraitSidebar,applyResponsiveStyles,newChat } from "./ui.js";
+import { load_current_convo_from_UUID, sendQuestion } from "./api.js";
+import { getUUIDFromUrl } from "./utility.js";
 
 export const textarea = document.getElementById('userInput');
 document.addEventListener('DOMContentLoaded', () => {
@@ -91,5 +92,23 @@ const overlay = document.getElementById('sidebar-overlay');
 overlay.addEventListener('click',manageSidebar);
 
 
+const newChatContainer = document.getElementById('new_chat_container');
+newChatContainer.addEventListener('click',newChat)
+
+window.addEventListener('popstate',()=>{
+    /* check if the user is in root directory
+        because the user can continously click the back button until
+        there is no chat UUID in the url to read
+    */
+    if (window.location.pathname === "/") {//root directory
+        newChat();//modify UI for new chat
+        return;
+    }
+
+    //if the url has a UUID then that chat history is loaded
+    load_current_convo_from_UUID()
+
+});
 
 applyResponsiveStyles() 
+
