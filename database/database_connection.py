@@ -1,18 +1,33 @@
-import mysql.connector
-from mysql.connector import Error
 
-def get_db_connection():
-    try:
-        conn = mysql.connector.connect(
-            host="localhost",        
-            user="root", 
-            password="", 
-            database="user_chatbot_db"  
+import asyncpg
+import asyncio
+
+DATABASE_CONFIG = {
+    "host": "localhost",
+    "user": "postgres",        
+    "password": "password",
+    "database": "user_chatbot_db"
+}
+
+# Create a connection pool for reuse
+pool = None
+
+async def init_db_pool():
+    global pool
+    if pool is None:
+        pool = await asyncpg.create_pool(
+            host=DATABASE_CONFIG["host"],
+            user=DATABASE_CONFIG["user"],
+            password=DATABASE_CONFIG["password"],
+            database=DATABASE_CONFIG["database"],
+            min_size=1,
+            max_size=5
         )
-        return conn
-    except Error as e:
-        print("Error connecting to Database:", e)
-        return None
-    
+    return pool
 
-get_db_connection()
+async def get_db_connection():
+    global pool
+    if pool is None:
+        await init_db_pool()
+    
+    return pool

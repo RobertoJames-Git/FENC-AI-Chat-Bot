@@ -45,56 +45,67 @@ templates = Jinja2Templates(directory="templates")
 # Serve static files (CSS, JS)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Serve index.html at root
+
 @app.get("/chat/{current_convo_UUID}", response_class=HTMLResponse)
 @app.get("/", response_class=HTMLResponse)
 async def get_index(request: Request, current_convo_UUID: str | None = None):
-
-
-    #retrieve user email and fullname from session
+    # Retrieve user email and fullname from session
     email = request.session.get("student_email")
     fullname = request.session.get("fullname")
 
-    #if any of them are empty then the user is redirected to the login page
+    # Redirect to login if missing
     if email is None or fullname is None:
         return RedirectResponse(url="/static/login.html", status_code=302)
 
-    
-    nameSplit=fullname.split()
-    fname=nameSplit[0]
-    lname=nameSplit[1]
-    
-    #get token_UUID for past conversations
-    result=database_actions.get_conversation_token_UUID(email)
+    # Split names safely
+    nameSplit = fullname.split()
+    fname = nameSplit[0]
+    lname = nameSplit[1] if len(nameSplit) > 1 else ""
 
+    # Get token_UUID for past conversations
+    result = await database_actions.get_conversation_token_UUID(email)
 
     if "token_UUIDs" in result and "started_at" in result: # retrieve past conversation from users
         token_UUID_List = result["token_UUIDs"]
         date_of_convo = result["started_at"]
 
-        # inside your get_index route after fetching from DB:
-        formatted_dates = [dt.strftime("%b %d • %I:%M %p") for dt in date_of_convo]  # Windows safe
+        formatted_dates = [dt.strftime("%b %d • %I:%M %p") for dt in date_of_convo]
         conversations = list(zip(token_UUID_List, formatted_dates))
         # %b → abbreviated month (Jan, Feb, Aug)
         # %-d → day without leading zero (3 instead of 03)
         # %Y → full year
 
-        return templates.TemplateResponse("index.html", {
-            "request": request,
-            "email": email,
-            "fname": fname,
-            "lname": lname,
-            "conversations": conversations
-        })
-    
-    #if user does not have past conversation history of database error occurred
-    return templates.TemplateResponse("index.html", {
-        "request": request,
-        "email": email,
-        "fname": fname,
-        "lname": lname,
-        "message":result["message"] #errors like database errors or prompt user to start  aconversation
-    })
+
+        response = templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "email": email,
+                "fname": fname,
+                "lname": lname,
+                "conversations": conversations,
+            },
+        )
+    else:
+        response = templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "email": email,
+                "fname": fname,
+                "lname": lname,
+                "message": result.get("message", "No conversations found"),
+            },
+        )
+
+    # Add cache-control headers to the response
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    return response
+
+
+
+
 
 
 
@@ -109,7 +120,7 @@ async def get_current_conversation_history(request:Request,current_convo_UUID:st
     if email is None:
         return JSONResponse({"status":"unauthorized"},status_code=302)
     
-    current_convo_db_results= database_actions.get_current_convo(email,current_convo_UUID)
+    current_convo_db_results= await database_actions.get_current_convo(email,current_convo_UUID)
     
     if current_convo_db_results["status"]!="success":
         raise HTTPException(status_code=400, detail=current_convo_db_results["message"])
@@ -144,7 +155,7 @@ async def ask_question(request: Request):
     if token_UUID != "": #if a UUID was sent and it is not empty
 
         #retrieve convo history associated with UUID and email combination
-        convo_history = database_actions.get_current_convo(email,token_UUID)
+        convo_history = await database_actions.get_current_convo(email,token_UUID)
 
         if convo_history["status"] == "success":#records matching token uuid is found
             for role, text in convo_history["message"]:
@@ -175,10 +186,10 @@ async def ask_question(request: Request):
     
     dbResult=None
     if token_UUID == "": # if tokenuuid is empty then create it and add the first new conversation
-        dbResult = database_actions.store_new_conversation(email,question,response)
+        dbResult = await database_actions.store_new_conversation(email,question,response)
 
     else:#if a token is returned then add the ai and user convo to the existing chat history
-        dbResult=database_actions.add_to_chat_history(email,token_UUID,question,response)
+        dbResult=await database_actions.add_to_chat_history(email,token_UUID,question,response)
 
     if dbResult["status"] != "success":
         return {"error": dbResult["message"]}
@@ -264,7 +275,7 @@ async def signup(request: Request):
         # Pattern ensures the email ends with @students.utech.edu.jm
         errors["email_error"] = "Must be a valid UTECH student email"
     else:
-        email_result = database_actions.email_exist(email)  # Only check existence if format is valid
+        email_result = await database_actions.email_exist(email)  # Only check existence if format is valid
         if email_result["status"] == "exists" or email_result["status"] == "error":
             errors["email_error"] = email_result["message"]
 
@@ -304,7 +315,7 @@ async def signup(request: Request):
     if errors:
         return JSONResponse(content=errors, status_code=400)
     
-    result = database_actions.insert_student(email, fname, lname, password)
+    result = await database_actions.insert_student(email, fname, lname, password)
 
     #check if an error occurred from adding the user to the database and send it to the frontend
     if not result[0]:
@@ -375,7 +386,7 @@ async def activate_account(request: Request):
         request.session["activation_attempt_count"] = 1
 
     # Proceed with activation logic
-    result = database_actions.process_activation(email, token)
+    result = await database_actions.process_activation(email, token)
 
     if result["status"] == "error":
         return JSONResponse(content={"message":result["message"]}, status_code=500)
@@ -461,7 +472,7 @@ async def verify_login(request: Request):
 
     # Attempt to retrieve credentials from database
     credentials_error = "Email and / or password is incorrect"
-    result = database_actions.get_hashed_password_and_fullname(email)
+    result = await database_actions.get_hashed_password_and_fullname(email)
 
 
     # Handle invalid credentials
@@ -491,7 +502,7 @@ async def verify_login(request: Request):
     if verify_hash(password, hashed_password):
 
         #check if acccount is active
-        db_result=database_actions.account_is_active(email)
+        db_result=await database_actions.account_is_active(email)
 
         if db_result["status"] == False: #check if account was activated
             errors["email_error"] = db_result["message"]
@@ -525,11 +536,17 @@ async def verify_login(request: Request):
 
 
 @app.post("/logout")
-def logout(response: Response):
-    response.delete_cookie("session")  # clears the session cookie
-    return {"message": "Logged out", "redirect":"static/login.html"}
-
-
+async def logout(request: Request, response: Response):
+    # Clear all session data immediately
+    request.session.clear()
+    
+    # Remove the session cookie from the browser
+    response.delete_cookie("session")
+    
+    # Return JSON with redirect instruction
+    return JSONResponse(
+        {"message": "Logged out", "redirect": "static/login.html"}
+    )
 
 
 
