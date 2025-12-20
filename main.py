@@ -188,15 +188,18 @@ async def ask_question(request: Request):
     # Refresh session cookie manually
     # ------------------------
     session_cookie = request.cookies.get("session")
-    payload = {"response": response}
+    payload={}
+    payload["response"]=response #AI response
 
     if "token_uuid" in dbResult: # if the uuid was generated from a new chat
         payload["token_uuid"] = dbResult["token_uuid"]
+        payload["convo_timestamp"] =dbResult["convo_timestamp"]
+
     else: # if the UUID is for an existing chat
         payload["token_uuid"] = token_UUID
 
     if session_cookie:
-        response_obj = JSONResponse(content=payload) #response and UUID
+        response_obj = JSONResponse(content=payload) # AI response and UUID
         response_obj.set_cookie(
             key="session",
             value=session_cookie,

@@ -184,11 +184,6 @@ def process_activation(email: str, token: str):
 
 
 def store_new_conversation(email, user_message, ai_message):
-    """
-    Create a new conversation for a user and insert both the first user
-    message and the AI response into chat_history.
-    Returns conversation_id and token_uuid.
-    """
     conn = get_db_connection()
     if conn is None:
         return {"status": "db_error", "message": database_conn_error_msg}
@@ -198,30 +193,23 @@ def store_new_conversation(email, user_message, ai_message):
         token_uuid = str(uuid.uuid4())
         cursor = conn.cursor()
 
-        # 1) Insert into conversation table
-        sql = "INSERT INTO conversation (token_UUID, email) VALUES (%s, %s);"
-        cursor.execute(sql, (token_uuid, email))
+        # Call the stored procedure
+        cursor.callproc("store_new_conversation", (email, token_uuid, user_message, ai_message))
 
-        # Get the auto-generated conversation_id
-        conversation_id = cursor.lastrowid
-
-        # 2) Insert user message
-        sql_user = """
-            INSERT INTO chat_history (conversation_id, role, message)
-            VALUES (%s, %s, %s);
-        """
-        cursor.execute(sql_user, (conversation_id, "user", user_message))
-
-        # 3) Insert AI response
-        sql_ai = """
-            INSERT INTO chat_history (conversation_id, role, message)
-            VALUES (%s, %s, %s);
-        """
-        cursor.execute(sql_ai, (conversation_id, "AI", ai_message))
+        # The procedure returns a result set
+        for result in cursor.stored_results():
+            row = result.fetchone()
+            token_uuid, convo_timestamp = row
 
         conn.commit()
 
-        return {"status": "success","token_uuid": token_uuid}
+        convo_timestamp=convo_timestamp.strftime("%b %d • %I:%M %p")
+
+        return {
+            "status": "success",
+            "token_uuid": token_uuid,
+            "convo_timestamp": convo_timestamp
+        }
 
     except Exception as e:
         print("Database Query failed:", str(e))
@@ -230,9 +218,6 @@ def store_new_conversation(email, user_message, ai_message):
     finally:
         cursor.close()
         conn.close()
-
-
-
 
     
 def add_to_chat_history(email,token_UUID,user_message,ai_message):
@@ -293,7 +278,12 @@ def get_conversation_token_UUID(email):
     
     try:
         cursor = conn.cursor()
-        sql = "SELECT token_UUID, started_at FROM conversation WHERE email = %s order by started_at DESC;"
+        sql = """
+        SELECT token_UUID, started_at FROM conversation 
+        WHERE email = %s 
+        AND deleted_at is NULL
+        order by started_at DESC;
+        """
         cursor.execute(sql, (email,))
         rows = cursor.fetchall() #get all records
 

@@ -30,12 +30,13 @@ export async function sendQuestion() {
     
 
     const res = await fetch("/ask", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ question: userInput, token_uuid : state.conversationTokenUUID})
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ question: userInput, token_uuid : state.conversationTokenUUID})
     });
+
     const data = await res.json();
 
     console.log(data);
@@ -43,6 +44,19 @@ export async function sendQuestion() {
     let formattedResponse ="";
 
     if(data.response){
+
+        if (state.conversationTokenUUID ==null){//means the chat is new so add it to the chats list 
+            
+            const prev_convo_container = document.querySelector('.previous_conversations').cloneNode(true);
+            prev_convo_container.setAttribute('data-token-uuid',data.token_uuid);
+            prev_convo_container.innerHTML = '';
+            prev_convo_container.textContent=data.convo_timestamp;
+
+            const container = document.getElementById('conversation_history_container');
+            const firstChild = container.firstElementChild;
+            container.insertBefore(prev_convo_container, firstChild.nextSibling);
+            
+        }
 
         state.conversationTokenUUID = data.token_uuid; //retrieve the uuid and add it to url
         //retrieve the uuid and update url with uuid without a page reload
@@ -52,6 +66,7 @@ export async function sendQuestion() {
         //The AI may return data with astericks and other symbols and this function
         // removes those symbols and use them as indicator to know when to style the text or create a list
         formattedResponse = formatMarkdown(data.response);
+
 
     }
     else{ // if the Server returns errors then they are displayed
