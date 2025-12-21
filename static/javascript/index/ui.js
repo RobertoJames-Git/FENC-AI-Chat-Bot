@@ -261,7 +261,7 @@ export function addMessageToUI(userRole,messageText) {
 
 
 
-function addEventListenerToLoadPastConversations(){
+export function addEventListenerToLoadPastConversations(action=true){
     const prevConvoElements = document.querySelectorAll('.previous_conversations');
 
     for (const eachElement of prevConvoElements){
@@ -284,7 +284,13 @@ function addEventListenerToLoadPastConversations(){
             document.getElementById('ai_and_user_container').innerHTML='';
             addUuidToUrl(element_UUID);
             load_current_convo_from_UUID();
+
         });
+
+        if (action == false){//only add eventlistener to first element if a new convo was started
+            break;
+        }
+
     }
 }
 

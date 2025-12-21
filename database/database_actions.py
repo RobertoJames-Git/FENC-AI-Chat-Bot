@@ -65,7 +65,7 @@ async def insert_student(email: str, fname: str, lname: str, plain_password: str
 
             # Call stored procedure (Postgres syntax: SELECT function_name(...))
             await conn.execute(
-                "SELECT insert_student_with_activation($1, $2, $3, $4, $5);",
+                "CALL insert_student_with_activation($1, $2, $3, $4, $5);",
                 email, fname, lname, hashed_password, hashed_token
             )
 
@@ -195,7 +195,7 @@ async def store_new_conversation(email, user_message, ai_message):
             convo_timestamp = row["convo_timestamp"].strftime("%b %d • %I:%M %p")
             return {
                 "status": "success",
-                "token_uuid": row["token_uuid"],
+                "token_uuid": str(row["token_uuid"]),
                 "convo_timestamp": convo_timestamp
             }
         else:
@@ -313,4 +313,3 @@ async def get_current_convo(email: str, current_convo_UUID: str):
 
 
 
-    

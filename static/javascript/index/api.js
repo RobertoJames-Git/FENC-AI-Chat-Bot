@@ -1,5 +1,5 @@
 import { textarea } from "./events.js";
-import { displayServerError, addMessageToUI, removeWelcomeMessage } from "./ui.js";
+import { displayServerError, addMessageToUI, removeWelcomeMessage, addEventListenerToLoadPastConversations } from "./ui.js";
 import { addUuidToUrl, formatMarkdown,getUUIDFromUrl } from "./utility.js";
 import { state } from "./state.js";
 
@@ -47,14 +47,33 @@ export async function sendQuestion() {
 
         if (state.conversationTokenUUID ==null){//means the chat is new so add it to the chats list 
             
-            const prev_convo_container = document.querySelector('.previous_conversations').cloneNode(true);
-            prev_convo_container.setAttribute('data-token-uuid',data.token_uuid);
-            prev_convo_container.innerHTML = '';
-            prev_convo_container.textContent=data.convo_timestamp;
+            let prev_convo_container = document.querySelector('.previous_conversations');
+            const convo_hist_container = document.getElementById('conversation_history_container');
 
-            const container = document.getElementById('conversation_history_container');
-            const firstChild = container.firstElementChild;
-            container.insertBefore(prev_convo_container, firstChild.nextSibling);
+            if (prev_convo_container){//if there are existing conversations
+                prev_convo_container = prev_convo_container.cloneNode(true)
+                prev_convo_container.setAttribute('data-token-uuid',data.token_uuid);
+                prev_convo_container.innerHTML = ` <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px"> ${data.convo_timestamp}`;
+    
+                const firstChild = convo_hist_container.firstElementChild;
+                convo_hist_container.insertBefore(prev_convo_container, firstChild.nextSibling);
+            }
+            else{//first conversation being added
+                const no_convo_element = document.getElementById('no_convo');
+                no_convo_element.style.display = 'none';
+
+                const newConversation=`
+                    <div class="previous_conversations" token_UUID="${data.token_uuid}">
+                        <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px">
+                        ${data.convo_timestamp}
+                    </div>
+                `;
+
+                convo_hist_container.insertAdjacentHTML("beforeend", newConversation);
+                addEventListenerToLoadPastConversations(false);
+
+
+            }
             
         }
 
@@ -110,20 +129,18 @@ export function load_current_convo_from_UUID(tokenUUID){
     .then(data =>{
 
         removeWelcomeMessage();
+
         
-        //display user and AI message on the page
-        for (const eachElement of data.message){
+        // display user and AI message on the page
+        for (const eachElement of data.message) {
             console.log(eachElement);
-
-            if(eachElement[0].toLowerCase() === "user"){
-                addMessageToUI("user",eachElement[1] );
+        
+            if (eachElement.role.toLowerCase() === "user") {
+                addMessageToUI("user", eachElement.message);
+            } else {
+                addMessageToUI("ai_response", formatMarkdown(eachElement.message));
             }
-            else {
-                addMessageToUI("ai_response",formatMarkdown(eachElement[1]) );
-            }
-
         }
-
         //Update the UUID of the current message so that when other messages are sent they are appended to the current convo history in the database
         state.conversationTokenUUID = tokenUUID;
 
