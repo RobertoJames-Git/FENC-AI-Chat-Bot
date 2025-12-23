@@ -1,5 +1,5 @@
 import { textarea } from "./events.js";
-import { displayServerError, addMessageToUI, removeWelcomeMessage, addEventListenerToLoadPastConversations } from "./ui.js";
+import { displayServerError, addMessageToUI, removeWelcomeMessage,updateConversationList } from "./ui.js";
 import { addUuidToUrl, formatMarkdown,getUUIDFromUrl } from "./utility.js";
 import { state } from "./state.js";
 
@@ -47,33 +47,7 @@ export async function sendQuestion() {
 
         if (state.conversationTokenUUID ==null){//means the chat is new so add it to the chats list 
             
-            let prev_convo_container = document.querySelector('.previous_conversations');
-            const convo_hist_container = document.getElementById('conversation_history_container');
-
-            if (prev_convo_container){//if there are existing conversations
-                prev_convo_container = prev_convo_container.cloneNode(true)
-                prev_convo_container.setAttribute('data-token-uuid',data.token_uuid);
-                prev_convo_container.innerHTML = ` <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px"> ${data.convo_timestamp}`;
-    
-                const firstChild = convo_hist_container.firstElementChild;
-                convo_hist_container.insertBefore(prev_convo_container, firstChild.nextSibling);
-            }
-            else{//first conversation being added
-                const no_convo_element = document.getElementById('no_convo');
-                no_convo_element.style.display = 'none';
-
-                const newConversation=`
-                    <div class="previous_conversations" token_UUID="${data.token_uuid}">
-                        <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px">
-                        ${data.convo_timestamp}
-                    </div>
-                `;
-
-                convo_hist_container.insertAdjacentHTML("beforeend", newConversation);
-                addEventListenerToLoadPastConversations(false);
-
-
-            }
+            updateConversationList(data.token_uuid,data.convo_timestamp);
             
         }
 
@@ -88,7 +62,7 @@ export async function sendQuestion() {
 
 
     }
-    else{ // if the Server returns errors then they are displayed
+    else { // if the Server returns errors then they are displayed
 
         displayServerError(data.detail);
         loadingIcon.remove()
@@ -130,7 +104,6 @@ export function load_current_convo_from_UUID(tokenUUID){
 
         removeWelcomeMessage();
 
-        
         // display user and AI message on the page
         for (const eachElement of data.message) {
             console.log(eachElement);
@@ -151,6 +124,38 @@ export function load_current_convo_from_UUID(tokenUUID){
         displayServerError(error);
     })
     
+}
+
+
+
+
+export function  logout() {
+    const logoutDiv = document.getElementById("logout_container");
+  
+    if (logoutDiv) {
+
+      logoutDiv.addEventListener("click", async function () {
+        try {
+          const response = await fetch("/logout", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            }
+          });
+  
+          const data = await response.json();
+  
+          if (data.redirect) {
+            window.location.href = "/" + data.redirect;
+          } else {
+            alert("Logout successful, but no redirect provided.");
+          }
+        } catch (error) {
+          console.error("Logout failed:", error);
+          alert("An error occurred while logging out.");
+        }
+      });
+    }
 }
 
 

@@ -1,7 +1,5 @@
 import { state } from "./state.js";
-import { addUuidToUrl, resetUrl } from "./utility.js"; // This import is duplicated, but one is needed. Let's keep it clean.
-import { load_current_convo_from_UUID } from "./api.js"; // This is the function that needs to be imported.
-
+import { resetUrl } from "./utility.js"; // This import is duplicated, but one is needed. Let's keep it clean.
 
 
 let chatHistoryContainer= document.getElementById('ai_and_user_container');
@@ -261,40 +259,6 @@ export function addMessageToUI(userRole,messageText) {
 
 
 
-export function addEventListenerToLoadPastConversations(action=true){
-    const prevConvoElements = document.querySelectorAll('.previous_conversations');
-
-    for (const eachElement of prevConvoElements){
-
-        const element_UUID=eachElement.getAttribute("token_uuid");
-
-        eachElement.addEventListener('click',()=>{
-            const uuidFromUrl = element_UUID;
-
-            if (!uuidFromUrl){//if uuid in url is invalid
-                return;
-            }
-
-            //if user reselects the same element then this prevents me from calling the database again for the chat history
-            if(state.conversationTokenUUID === uuidFromUrl){
-                return;
-            }
-
-            //remove previous chat history before showing current chat history
-            document.getElementById('ai_and_user_container').innerHTML='';
-            addUuidToUrl(element_UUID);
-            load_current_convo_from_UUID();
-
-        });
-
-        if (action == false){//only add eventlistener to first element if a new convo was started
-            break;
-        }
-
-    }
-}
-
-
 
 export function newChat(){
 
@@ -318,4 +282,32 @@ export function newChat(){
 }
 
 
-addEventListenerToLoadPastConversations();
+export function updateConversationList(token_uuid,timestamp){
+    const newConversation=`
+    <div class="previous_conversations" data-token-uuid="${token_uuid}">
+        <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px">
+        ${timestamp}
+    </div>`;
+    
+    const convHistoryContainer = document.getElementById('conversation_history_container');
+    
+    const prevAddedConvo = document.querySelectorAll('.previous_conversations');
+    if (prevAddedConvo.length>0){//if there are existing conversations
+        
+        //add as 2nd element in the div or first element in conversation list
+        convHistoryContainer.children[0].insertAdjacentHTML('afterend',newConversation);
+        
+    }
+    else{//first conversation being added
+        const no_convo_element = document.getElementById('no_convo');
+        no_convo_element.style.display = 'none';
+        
+        convHistoryContainer.insertAdjacentHTML("beforeend", newConversation);//add at end
+        
+        
+    }
+}
+
+
+
+

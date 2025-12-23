@@ -1,6 +1,7 @@
 import { manageSidebar,controlPortraitSidebar,applyResponsiveStyles,newChat } from "./ui.js";
-import { load_current_convo_from_UUID, sendQuestion } from "./api.js";
-import { getUUIDFromUrl } from "./utility.js";
+import { load_current_convo_from_UUID, logout, sendQuestion } from "./api.js";
+import { state } from "./state.js";
+import { addUuidToUrl } from "./utility.js";
 
 export const textarea = document.getElementById('userInput');
 document.addEventListener('DOMContentLoaded', () => {
@@ -60,33 +61,8 @@ const sidebarIconPortrait = document.getElementById('sidebar_icon_portrait');
 sidebarIconPortrait.addEventListener('click',controlPortraitSidebar)
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    const logoutDiv = document.getElementById("logout_container");
-  
-    if (logoutDiv) {
-      logoutDiv.addEventListener("click", async function () {
-        try {
-          const response = await fetch("/logout", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json"
-            }
-          });
-  
-          const data = await response.json();
-  
-          if (data.redirect) {
-            window.location.href = "/" + data.redirect;
-          } else {
-            alert("Logout successful, but no redirect provided.");
-          }
-        } catch (error) {
-          console.error("Logout failed:", error);
-          alert("An error occurred while logging out.");
-        }
-      });
-    }
-});
+document.addEventListener("DOMContentLoaded", logout);
+
 
 const overlay = document.getElementById('sidebar-overlay');
 overlay.addEventListener('click',manageSidebar);
@@ -110,5 +86,44 @@ window.addEventListener('popstate',()=>{
 
 });
 
+
+export function clickToLoadChat(element) {
+    // We change this to accept the element directly for easier use with delegation
+    const uuidFromUrl = element.dataset.tokenUuid; 
+
+    if (!uuidFromUrl) return;
+
+    if (state.conversationTokenUUID === uuidFromUrl) return;
+
+    document.getElementById('ai_and_user_container').innerHTML = '';
+    addUuidToUrl(uuidFromUrl);
+    
+    // Pass the UUID directly to the function
+    load_current_convo_from_UUID(uuidFromUrl);
+}
+
+
+function loadPastConversationOnClick(){
+
+
+    // add listener on the parent container
+    const convoHistoryContainer = document.getElementById('conversation_history_container');
+    
+    if (convoHistoryContainer) {
+        convoHistoryContainer.addEventListener('click', (event) => {
+            // Find if the click was on (or inside) a .previous_conversations div
+            const targetElement = event.target.closest('.previous_conversations');
+            
+            if (targetElement) {
+                clickToLoadChat(targetElement);
+            }
+        });
+    }
+}
+
+
+
+
+loadPastConversationOnClick()
 applyResponsiveStyles() 
 

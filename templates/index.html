@@ -29,9 +29,10 @@
 
                 <div id="conversation_history_container" >
                     <p>Chats</p>
+
                     {% if conversations %}
                         {%for uuid, convo_date in conversations %}
-                            <div class="previous_conversations" token_UUID="{{ uuid }}">
+                            <div class="previous_conversations" data-token-uuid="{{ uuid }}">
                                 <img src="/static/images/icons8-chat-room-96.svg" alt="" width="20px">
                                 {{ convo_date }}
                             </div>
