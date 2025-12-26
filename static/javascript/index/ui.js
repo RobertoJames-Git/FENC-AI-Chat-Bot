@@ -207,7 +207,7 @@ export function displayServerError(errorMsg) {
     const container = document.getElementById('errorMsg');
     const content = document.getElementById('errorMsgContent');
   
-    content.textContent = errorMsg;
+    content.innerHTML = errorMsg;
   
     // Reset to hidden state
     container.classList.remove('show');
@@ -309,5 +309,11 @@ export function updateConversationList(token_uuid,timestamp){
 }
 
 
+
+
+export function updatePromptCountOnUI(prompCount){
+    const promptElement= document.querySelector('#responses_container span');
+    promptElement.innerText=prompCount;
+}
 
 

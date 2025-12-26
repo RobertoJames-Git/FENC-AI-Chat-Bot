@@ -1,15 +1,19 @@
-import google.generativeai as genai
-from dotenv import load_dotenv
 import os
+from dotenv import load_dotenv
+# 1. Changed import statement
+from google import genai 
 
 load_dotenv()
 api_key = os.getenv("GEMINI_API_KEY")
+
 if not api_key:
     raise ValueError("GEMINI_API_KEY not found in .env file")
 
-genai.configure(api_key=api_key)
+# 2. Initialize the Client instead of genai.configure()
+client = genai.Client(api_key=api_key)
 
-model = genai.GenerativeModel('gemini-2.5-flash')
+# 3. Model name - Note: Ensure you use 'gemini-2.0-flash' or 'gemini-1.5-flash'
+MODEL_ID = 'gemini-2.0-flash' 
 
 def create_section_paths_dict(base_folder="Sections"):
     section_paths = {}
@@ -27,8 +31,11 @@ def create_section_paths_dict(base_folder="Sections"):
                 key_list.append("- " + key_name + "\n")
     return section_paths, key_list
 
+def get_gemini_response(user_question: str, chat_history: list, ai_client: genai.Client) -> str:
 
-def get_gemini_response(user_question: str, chat_history: list) -> str:
+    '''
+    Accepts the ai_client as an argument so we dont recreate it
+    '''    
     section_paths, key_list = create_section_paths_dict()
 
     ask_sections_prompt = (
@@ -40,7 +47,11 @@ def get_gemini_response(user_question: str, chat_history: list) -> str:
         f"Reply with the relevant section names."
     )
 
-    section_response = model.generate_content(ask_sections_prompt)
+    # 4. Updated content generation call
+    section_response = ai_client.models.generate_content(
+        model=MODEL_ID, 
+        contents=ask_sections_prompt
+    )
     section_text = section_response.text.lower()
 
     included_texts = []
@@ -69,5 +80,12 @@ def get_gemini_response(user_question: str, chat_history: list) -> str:
             f"{history_text}\n\nStudent: {user_question}"
         )
 
-    final_response = model.generate_content(combined_prompt)
+    # 5. Updated second generation call
+    final_response = ai_client.models.generate_content(
+        model=MODEL_ID, 
+        contents=combined_prompt
+    )
     return final_response.text
+
+
+

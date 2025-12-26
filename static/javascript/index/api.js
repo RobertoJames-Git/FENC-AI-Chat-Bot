@@ -1,5 +1,5 @@
 import { textarea } from "./events.js";
-import { displayServerError, addMessageToUI, removeWelcomeMessage,updateConversationList } from "./ui.js";
+import { displayServerError, addMessageToUI, removeWelcomeMessage,updateConversationList, updatePromptCountOnUI } from "./ui.js";
 import { addUuidToUrl, formatMarkdown,getUUIDFromUrl } from "./utility.js";
 import { state } from "./state.js";
 
@@ -68,6 +68,9 @@ export async function sendQuestion() {
         loadingIcon.remove()
         return;
     }
+
+    //update the number of questions asked
+    updatePromptCountOnUI(data.num_questions_asked)
 
     //remove loading icon
     loadingIcon.remove()

@@ -2,8 +2,8 @@ from fastapi import FastAPI, Request,HTTPException,Response
 from fastapi.responses import HTMLResponse, FileResponse,JSONResponse,RedirectResponse
 from datetime import datetime, timedelta
 from fastapi.staticfiles import StaticFiles
-from gemini import get_gemini_response
-from google.api_core.exceptions import ResourceExhausted
+from gemini import get_gemini_response, client
+from google.genai.errors import ClientError 
 from fastapi.middleware.cors import CORSMiddleware
 from utility.hash_utils import verify_hash
 from database import database_actions
@@ -65,6 +65,11 @@ async def get_index(request: Request, current_convo_UUID: str | None = None):
     # Get token_UUID for past conversations
     result = await database_actions.get_conversation_token_UUID(email)
 
+        #initalize questions asked to 5 if it does not exist
+    if "num_questions_asked" not in request.session:
+        request.session["num_questions_asked"] = 5
+
+
     if "token_UUIDs" in result and "started_at" in result: # retrieve past conversation from users
         token_UUID_List = result["token_UUIDs"]
         date_of_convo = result["started_at"]
@@ -84,6 +89,7 @@ async def get_index(request: Request, current_convo_UUID: str | None = None):
                 "fname": fname,
                 "lname": lname,
                 "conversations": conversations,
+                "num_questions_asked": request.session["num_questions_asked"]
             },
         )
     else:
@@ -95,6 +101,7 @@ async def get_index(request: Request, current_convo_UUID: str | None = None):
                 "fname": fname,
                 "lname": lname,
                 "message": result.get("message", "No conversations found"),
+                "num_questions_asked": request.session["num_questions_asked"]
             },
         )
 
@@ -131,6 +138,7 @@ async def get_current_conversation_history(request:Request,current_convo_UUID:st
 
 
 
+
 @app.post("/ask")
 async def ask_question(request: Request):
 
@@ -138,6 +146,11 @@ async def ask_question(request: Request):
     # Make sure user is logged in
     if not email:
         return  {"error":"You are not logged in"}
+    
+    #reduce the number of questions asked each time
+    if request.session["num_questions_asked"] ==0:
+        raise HTTPException(status_code=429, detail="You've hit the quota limit. It will reset in 24 hours.")
+    request.session["num_questions_asked"] -=1
 
 
     data = await request.json()
@@ -172,13 +185,17 @@ async def ask_question(request: Request):
 
 
     try:
-        #pass chat history and user question to this funciton which will return the AI response
-        response = get_gemini_response(question, chat_history)
-    except ResourceExhausted as e:
-        print ("Resource Exhausted : ",e.details)
-        raise HTTPException(status_code=429,detail="You've hit the quota limit. Please try again later.")
+        response = get_gemini_response(question, chat_history, client)
+    except ClientError as e:
+        # Changed 'e.status_code' to 'e.code'
+        if e.code == 429:
+            print("Quota Exhausted: ", e)
+            raise HTTPException(status_code=429, detail="You've hit the quota limit. Please try again later.")
+        else:
+            print(f"AI Client Error ({e.code}): ", e)
+            raise HTTPException(status_code=500, detail="AI Service Error")
 
-    
+
     #Debug
     print("User: ",question)
     print("AI: ",response)
@@ -208,6 +225,9 @@ async def ask_question(request: Request):
 
     else: # if the UUID is for an existing chat
         payload["token_uuid"] = token_UUID
+
+    #returns the number of questions remaining
+    payload["num_questions_asked"] = request.session["num_questions_asked"]
 
     if session_cookie:
         response_obj = JSONResponse(content=payload) # AI response and UUID

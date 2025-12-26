@@ -150,6 +150,9 @@ body{
     border-radius: 10px 10px 0px 0px;
 }
 
+#options_container{
+    display: flex;
+}
 
 #options_container img{
     float: right;
@@ -158,6 +161,29 @@ body{
     margin: 0px 5px 5px 0px;
     border-radius: 20px;
     cursor: pointer;
+    justify-content: flex-end;
+    margin-left:auto;
+}
+
+
+#responses_container{
+    display: flex;
+    background-color: #1946da;
+    border-radius: 0px 10px 0px 10px;
+    font-size: 14px;
+    padding: 0px 10px 0px 10px;
+    margin: 0px;
+    justify-items: center;
+    align-items: center;
+
+}
+
+#responses_container span{
+    margin-left: 5px;
+    background-color: white;
+    padding: 3px 7px;
+    border-radius: 20px;
+    color:#1946da;
 }
 
 #options_container img:hover{
@@ -494,7 +520,8 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.2);
   z-index: 10;
-  max-width: 300px;
+  width:max-content;
+  max-width: 80%;
   outline: 2px solid red;
   display: none;
 }
@@ -543,3 +570,7 @@ padding-left: 1.2em;     /* you can increase for 4th level: 1.2em more */
     flex: 1;          /* takes available space in sidebar */
     min-height: 0;    /* VERY IMPORTANT for scrolling */
 }
+
+
+
+
