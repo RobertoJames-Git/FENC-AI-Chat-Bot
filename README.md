@@ -31,10 +31,11 @@ The chatbot uses a **keyword-based section matching** system to select relevant 
 
 ## 🛠 Tech Stack  
 
-- **Backend**: [FastAPI](https://fastapi.tiangolo.com/) (Python)  
+- **Backend**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
 - **Frontend**: HTML, CSS, JavaScript (planned UI improvements)  
 - **AI Integration**: Google Gemini API (current), expandable for other models  
 - **Deployment**: To be hosted on a standalone web server for production  
+- **Database**: PostgreSQL
 
 ---
 
