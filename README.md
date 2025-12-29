@@ -39,7 +39,7 @@ The chatbot uses a **keyword-based section matching** system to select relevant 
 
 - **LLM (The Brain)**: Gemma 3 27B (via OpenRouter) — The language model that processes the handbook context to generate answers.
 
-- **Database: PostgreSQL** - Stores persistent data like user accounts, conversation logs (for analytics), and student profiles.
+- **Database: PostgreSQL** - Stores persistent data like user login credentials, conversation logs.
 
 ---
 
