@@ -31,11 +31,15 @@ The chatbot uses a **keyword-based section matching** system to select relevant 
 
 ## 🛠 Tech Stack  
 
-- **Backend**: [FastAPI](https://fastapi.tiangolo.com/) (Python)
-- **Frontend**: HTML, CSS, JavaScript (planned UI improvements)  
-- **AI Integration**: Google Gemini API (current), expandable for other models  
-- **Deployment**: To be hosted on a standalone web server for production  
-- **Database**: PostgreSQL
+- **Backend**: [FastAPI](https://fastapi.tiangolo.com/) (Python) — Handles user sessions, question quotas, and coordinates with the AI engine.
+
+- **Frontend**: HTML, CSS, JavaScript - A clean, responsive interface for students to interact with the bot.
+
+- **Knowledge & AI Engine**: AnythingLLM — Acts as the RAG Middleware. It manages your university handbook documents, vectorizes the text, and provides the API gateway.
+
+- **LLM (The Brain)**: Gemma 3 27B (via OpenRouter) — The language model that processes the handbook context to generate answers.
+
+- **Database: PostgreSQL** - Stores persistent data like user accounts, conversation logs (for analytics), and student profiles.
 
 ---
 
