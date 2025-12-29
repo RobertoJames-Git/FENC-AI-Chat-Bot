@@ -1,9 +1,9 @@
+import requests
 from fastapi import FastAPI, Request,HTTPException,Response
 from fastapi.responses import HTMLResponse, FileResponse,JSONResponse,RedirectResponse
 from datetime import datetime, timedelta
 from fastapi.staticfiles import StaticFiles
-from gemini import get_gemini_response, client
-from google.genai.errors import ClientError 
+from chatbot import get_ai_response
 from fastapi.middleware.cors import CORSMiddleware
 from utility.hash_utils import verify_hash
 from database import database_actions
@@ -12,6 +12,7 @@ import re
 from dotenv import load_dotenv
 import os
 from fastapi.templating import Jinja2Templates
+import time
 
 
 
@@ -65,7 +66,7 @@ async def get_index(request: Request, current_convo_UUID: str | None = None):
     # Get token_UUID for past conversations
     result = await database_actions.get_conversation_token_UUID(email)
 
-        #initalize questions asked to 5 if it does not exist
+    #initalize questions asked to 5 if it does not exist
     if "num_questions_asked" not in request.session:
         request.session["num_questions_asked"] = 5
 
@@ -138,6 +139,9 @@ async def get_current_conversation_history(request:Request,current_convo_UUID:st
 
 
 
+# Define the reset window in seconds (6 hours)
+RESET_WINDOW = 6 * 3600 
+DEFAULT_QUOTA = 10 # Set your desired starting quota here
 
 @app.post("/ask")
 async def ask_question(request: Request):
@@ -147,11 +151,27 @@ async def ask_question(request: Request):
     if not email:
         return  {"error":"You are not logged in"}
     
-    #reduce the number of questions asked each time
-    if request.session["num_questions_asked"] ==0:
-        raise HTTPException(status_code=429, detail="You've hit the quota limit. It will reset in 24 hours.")
-    request.session["num_questions_asked"] -=1
+    # Initialize if missing
+    if "num_questions_asked" not in request.session:
+        request.session["num_questions_asked"] = DEFAULT_QUOTA
+        request.session["last_reset_time"] = time.time()
 
+    current_time = time.time()
+
+    # Reset window
+    if (current_time - request.session["last_reset_time"]) >= RESET_WINDOW:
+        request.session["num_questions_asked"] = DEFAULT_QUOTA
+        request.session["last_reset_time"] = current_time
+
+    # Check quota
+    if request.session["num_questions_asked"] <= 0:
+        raise HTTPException(
+            status_code=429,
+            detail="You've hit the quota limit. It resets every 6 hours."
+        )
+
+    # Decrement ONCE
+    request.session["num_questions_asked"] -= 1
 
     data = await request.json()
     
@@ -185,15 +205,32 @@ async def ask_question(request: Request):
 
 
     try:
-        response = get_gemini_response(question, chat_history, client)
-    except ClientError as e:
-        # Changed 'e.status_code' to 'e.code'
-        if e.code == 429:
-            print("Quota Exhausted: ", e)
-            raise HTTPException(status_code=429, detail="You've hit the quota limit. Please try again later.")
-        else:
-            print(f"AI Client Error ({e.code}): ", e)
-            raise HTTPException(status_code=500, detail="AI Service Error")
+
+        response = get_ai_response(question,chat_history)
+        
+        # MANUALLY check for the system error string
+        if "System error: The knowledge base is currently unavailable" in response:
+            raise HTTPException(status_code=500, detail= "The AI service returned an error.") 
+        
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 403:
+            print("AUTH ERROR: Check your API Key and Workspace Slug!")
+            raise HTTPException(status_code=403, detail="AnythingLLM Authentication Failed.")
+        raise HTTPException(status_code=500, detail=f"AI Provider Error: {e}")
+
+
+    # 2. Update Error Handling for AnythingLLM (Requests)
+    except requests.exceptions.ConnectionError:
+        print("Error: AnythingLLM Desktop is not running.")
+        raise HTTPException(status_code=503, detail="Knowledge base offline. Please try again later.")
+    
+    except requests.exceptions.HTTPError as e:
+        print(f"AnythingLLM API Error: {e}")
+        raise HTTPException(status_code=500, detail="The AI service returned an error.")
+
+    except Exception as e:
+        print(f"Unexpected Error: {e}")
+        raise HTTPException(status_code=500, detail="An internal error occurred")
 
 
     #Debug
